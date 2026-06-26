@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Aslan Bot Status - 7/24 Aktif" />
+  <!-- Content Security Policy backend'de (Helmet.js) yönetiliyor -->
+  <title>Aslan Bot Status</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-brand">
+        <div class="bot-logo">🤖</div>
+        <h1 class="bot-name" data-tr="Aslan Bot" data-en="Aslan Bot">
+          Aslan Bot
+        </h1>
+      </div>
+      <div class="nav-controls">
+        <button class="lang-toggle" id="langToggle">
+          <span class="lang-icon">🌐</span>
+          <span class="lang-text">EN</span>
+        </button>
+        <button class="theme-toggle" id="themeToggle">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h2 class="hero-title" data-tr="Bot Durumu" data-en="Bot Status">
+          Bot Durumu
+        </h2>
+        <p class="hero-subtitle" data-tr="7/24 Aktif Discord Botu" data-en="24/7 Active Discord Bot">
+          7/24 Aktif Discord Botu
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Bot Status -->
+  <section class="bot-status">
+    <div class="container">
+      <div class="status-grid">
+        <!-- Online Status -->
+        <div class="status-card">
+          <div class="status-icon online">
+            <span class="pulse"></span>
+            <span>✓</span>
+          </div>
+          <h3 data-tr="Durum" data-en="Status">Durum</h3>
+          <p class="status-value" id="botStatus" data-tr="Çevrimiçi" data-en="Online">
+            Çevrimiçi
+          </p>
+        </div>
+
+        <!-- Infrastructure Status -->
+        <div class="status-card">
+          <div class="status-icon infrastructure-status">
+            <span>🩺</span>
+          </div>
+          <h3 data-tr="Genel Durum" data-en="System Status">Genel Durum</h3>
+          <p class="status-value" id="systemStatus" style="font-size: 24px;">--</p>
+          <p class="status-detail" id="systemDetail" data-tr="Kontrol Ediliyor..." data-en="Checking...">
+            Kontrol Ediliyor...
+          </p>
+        </div>
+
+        <!-- Ping -->
+        <div class="status-card">
+          <div class="status-icon ping">
+            <span>📡</span>
+          </div>
+          <h3 data-tr="Ping" data-en="Ping">Ping</h3>
+          <p class="status-value" id="ping">45ms</p>
+          <p class="status-detail" data-tr="Düşük Gecikme" data-en="Low Latency">
+            Düşük Gecikme
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Server Infrastructure Status -->
+  <section class="infrastructure">
+    <div class="container">
+      <h2 class="section-title" data-tr="Altyapı Durumu" data-en="Infrastructure Status">
+        Altyapı Durumu
+      </h2>
+      <div class="infrastructure-grid">
+        <!-- Bot Servers -->
+        <div class="infra-card">
+          <div class="infra-header">
+            <div class="infra-icon bot">
+              <span>🤖</span>
+            </div>
+            <div class="infra-title-group">
+              <h3 data-tr="Bot Sunucuları" data-en="Bot Servers">
+                Bot Sunucuları
+              </h3>
+              <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+            </div>
+          </div>
+          <div class="infra-status">
+            <p class="infra-detail" data-tr="Tam performansta çalışıyor" data-en="Running at full performance">
+              Tüm sistemler çalışıyor
+            </p>
+          </div>
+        </div>
+
+        <!-- Discord Servers -->
+        <div class="infra-card">
+          <div class="infra-header">
+            <div class="infra-icon discord">
+              <span>💬</span>
+            </div>
+            <div class="infra-title-group">
+              <h3 data-tr="Discord Sunucuları" data-en="Discord Servers">
+                Discord Sunucuları
+              </h3>
+              <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+            </div>
+          </div>
+          <div class="infra-status">
+            <p class="infra-detail" data-tr="Bağlantı sağlıklı" data-en="Connection healthy">
+              Tüm sistemler çalışıyor
+            </p>
+          </div>
+        </div>
+
+        <!-- GitHub Servers -->
+        <div class="infra-card">
+          <div class="infra-header">
+            <div class="infra-icon github">
+              <span>🐙</span>
+            </div>
+            <div class="infra-title-group">
+              <h3 data-tr="GitHub Sunucuları" data-en="GitHub Servers">
+                GitHub Sunucuları
+              </h3>
+              <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+            </div>
+          </div>
+          <div class="infra-status">
+            <p class="infra-detail" data-tr="Tüm sistemler çalışıyor" data-en="All systems operational">
+              Tüm sistemler çalışıyor
+            </p>
+          </div>
+        </div>
+
+        <!-- API Servers -->
+        <div class="infra-card">
+          <div class="infra-header">
+            <div class="infra-icon api">
+              <span>⚡</span>
+            </div>
+            <div class="infra-title-group">
+              <h3 data-tr="API Sunucuları" data-en="API Servers">
+                API Sunucuları
+              </h3>
+              <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+            </div>
+          </div>
+          <div class="infra-status">
+            <p class="infra-detail" data-tr="Hızlı yanıt süresi" data-en="Fast response time">
+              Tüm sistemler çalışıyor
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Support Section -->
+  <section class="support">
+    <div class="container">
+      <h2 class="section-title" data-tr="İletişim & Destek" data-en="Contact & Support">
+        İletişim & Destek
+      </h2>
+      <div class="support-grid">
+        <!-- Youtube Card -->
+        <div class="support-card">
+          <div class="support-icon">🎬</div>
+          <h3 data-tr="YouTube Kanalımız" data-en="YouTube Channel">
+            YouTube Kanalımız
+          </h3>
+          <p data-tr="Kanalımıza abone olun" data-en="Subscribe to our channel">
+            Kanalımıza abone olun
+          </p>
+          <a href="https://www.youtube.com/@AslanOyun1" target="_blank" class="support-link" data-tr="Abone Ol"
+            data-en="Subscribe">Abone Ol</a>
+        </div>
+
+        <!-- Discord Card -->
+        <div class="support-card">
+          <div class="support-icon">💬</div>
+          <h3 data-tr="Discord Sunucusu" data-en="Discord Server">
+            Discord Sunucusu
+          </h3>
+          <p data-tr="Topluluğumuza katılın" data-en="Join our community">
+            Topluluğumuza katılın
+          </p>
+          <a href="https://discord.gg/d6RGBkFUj3" target="_blank" class="support-link" data-tr="Katıl"
+            data-en="Join">Katıl</a>
+        </div>
+
+        <!-- Email Card -->
+        <div class="support-card">
+          <div class="support-icon">📩</div>
+          <h3 data-tr="E-posta" data-en="Email">E-posta</h3>
+          <p data-tr="Bizimle iletişime geçin" data-en="Get in touch with us">
+            Bizimle iletişime geçin
+          </p>
+          <a href="mailto:aslanoyun36@gmail.com" class="support-link">aslanoyun36@gmail.com</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <p data-tr="© 2026 Aslan Oyun. Tüm hakları saklıdır." data-en="© 2026 Aslan Oyun. All rights reserved.">
+        © 2026 Aslan Oyun. Tüm hakları saklıdır.
+      </p>
+      <a href="gizlilik.html" style="color: #3b82f6; text-decoration: underline; font-size: 14px; font-weight: 500;">
+        Gizlilik Politikası
+      </a>
+    </div>
+  </footer>
+
+  <!-- Rate Limit Uyarı Toast -->
+  <div id="rateLimitToast" class="rate-limit-toast" style="display: none;">
+    <div class="toast-content">
+      <span class="toast-icon">⚠️</span>
+      <span class="toast-message" data-tr="Çok fazla istek gönderildi. Lütfen birkaç dakika bekleyin."
+        data-en="Too many requests. Please wait a few minutes.">Çok fazla istek gönderildi. Lütfen birkaç dakika
+        bekleyin.</span>
+      <button class="toast-close" id="toastClose">×</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

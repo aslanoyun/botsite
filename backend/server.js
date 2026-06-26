@@ -2,14 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
+
 // GÜVENLİK: Helmet.js - Security headers için
-// Kurulum: npm install helmet
 let helmet;
 try {
     helmet = require('helmet');
 } catch (e) {
     console.warn('⚠️  Helmet.js yüklü değil. Güvenlik için yükleyin: npm install helmet');
 }
+
+// 🟢 CRITICAL FIX: Unutulan express uygulamasını burada başlattık!
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 // ==================== RATE LIMITING ====================
 const botStatsRateLimitMap = new Map();
@@ -92,7 +96,7 @@ setInterval(() => {
     cleanup(serverStatusRateLimitMap);
 }, 5 * 60 * 1000);
 
-// ==================== CORS AYARLARI (GÜNCELLENDİ) ====================
+// ==================== CORS AYARLARI ====================
 const allowedOrigins = [
     'http://localhost:5500',
     'http://127.0.0.1:5500',
@@ -106,13 +110,13 @@ if (process.env.FRONTEND_URL) {
 
 const corsOptions = {
     origin: function (origin, callback) {
-        // Render'ın veya local sunucuların botsuz/originsiz isteklerine üretimde de izin veriyoruz
+        // Eğer istek başlığı yoksa (Render iç servisleri veya test araçları) izin ver
         if (!origin) {
             return callback(null, true);
         }
 
-        // İstek atan site izin verilenler listesindeyse veya local regex'e uyuyorsa onay ver
         const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+        // İzin verilen adresler, localhost veya onrender.com uzantılı sitelere izin ver
         if (allowedOrigins.includes(origin) || devRegex.test(origin) || origin.includes('.onrender.com')) {
             return callback(null, true);
         }
@@ -187,7 +191,6 @@ async function checkInfrastructureStatus() {
         bot: 'https://bot-moi8.onrender.com/'
     };
 
-    // Her servisi ayrı ayrı kontrol et (hata toleranslı)
     const checkService = async (url, isJson = true) => {
         try {
             const timeoutPromise = new Promise((_, reject) => {
@@ -212,7 +215,6 @@ async function checkInfrastructureStatus() {
         }
     };
 
-    // Paralel olarak tüm servisleri kontrol et
     const [githubData, discordData, botRes] = await Promise.all([
         checkService(services.github, true),
         checkService(services.discord, true),
@@ -228,28 +230,16 @@ async function checkInfrastructureStatus() {
 }
 
 // ==================== ENDPOINT: /api/bot/stats ====================
-// Bot verileri bu endpoint'te
 app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
-    // GÜVENLİK: CORS kontrolü
     const origin = req.headers.origin;
     if (origin) {
-        if (allowedOrigins.length === 0) {
-            const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
-            if (!devRegex.test(origin)) {
-                return res.status(403).json({
-                    success: false,
-                    error: 'Access denied',
-                    message: 'Not allowed by CORS - only localhost allowed in development'
-                });
-            }
-        } else {
-            if (!allowedOrigins.includes(origin)) {
-                return res.status(403).json({
-                    success: false,
-                    error: 'Access denied',
-                    message: 'Not allowed by CORS'
-                });
-            }
+        const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+        if (!allowedOrigins.includes(origin) && !devRegex.test(origin) && !origin.includes('.onrender.com')) {
+            return res.status(403).json({
+                success: false,
+                error: 'Access denied',
+                message: 'Not allowed by CORS'
+            });
         }
     } else if (process.env.NODE_ENV === 'production') {
         return res.status(403).json({
@@ -260,7 +250,6 @@ app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
     }
 
     try {
-        // Altyapı durumu (hata olsa bile devam et - önce bunu al)
         let infraStatus;
         try {
             infraStatus = await checkInfrastructureStatus();
@@ -274,31 +263,20 @@ app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
             };
         }
 
-        // Discord API istekleri (hata toleranslı)
         let botData = null;
         let guilds = [];
         let latency = 0;
         let botOnline = false;
 
         try {
-            const gatewayStart = Date.now();
-
-            // Bot bilgilerini al
             try {
                 botData = await fetchDiscordAPI('/users/@me');
                 botOnline = true;
             } catch (err) {
                 console.error('Bot data fetch error:', err.message);
-                botData = {
-                    id: 'unknown',
-                    username: 'Unknown',
-                    discriminator: '0000',
-                    avatar: null,
-                    verified: false
-                };
+                botData = { id: 'unknown', username: 'Unknown', discriminator: '0000', avatar: null, verified: false };
             }
 
-            // Guild bilgilerini al
             try {
                 const guildsData = await fetchDiscordAPI('/users/@me/guilds');
                 guilds = guildsData || [];
@@ -307,7 +285,6 @@ app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
                 guilds = [];
             }
 
-            // Latency hesapla
             try {
                 const latencyStart = Date.now();
                 await fetchDiscordAPI('/gateway');
@@ -318,10 +295,8 @@ app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
             }
         } catch (error) {
             console.error('Discord API error:', error.message);
-            // Discord API hatası olsa bile devam et
         }
 
-        // Her durumda yanıt döndür
         res.json({
             success: true,
             data: {
@@ -332,40 +307,25 @@ app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
                     avatar: botData.avatar,
                     verified: botData.verified
                 } : null,
-                status: {
-                    online: botOnline,
-                    latency: latency
-                },
-                guilds: {
-                    count: guilds.length
-                },
+                status: { online: botOnline, latency: latency },
+                guilds: { count: guilds.length },
                 infrastructure: infraStatus,
-                uptime: {
-                    startTime: BOT_START_TIME.toISOString()
-                },
+                uptime: { startTime: BOT_START_TIME.toISOString() },
                 timestamp: new Date().toISOString()
             }
         });
     } catch (error) {
         console.error('Bot stats error:', error);
-        // Son çare: Sadece altyapı durumunu döndür
         try {
             const infraStatus = await checkInfrastructureStatus();
             res.json({
                 success: true,
                 data: {
                     bot: null,
-                    status: {
-                        online: false,
-                        latency: 0
-                    },
-                    guilds: {
-                        count: 0
-                    },
+                    status: { online: false, latency: 0 },
+                    guilds: { count: 0 },
                     infrastructure: infraStatus,
-                    uptime: {
-                        startTime: BOT_START_TIME.toISOString()
-                    },
+                    uptime: { startTime: BOT_START_TIME.toISOString() },
                     timestamp: new Date().toISOString()
                 }
             });
@@ -374,35 +334,23 @@ app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
             res.status(500).json({
                 success: false,
                 error: 'Failed to fetch bot stats',
-                message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+                message: 'Internal server error'
             });
         }
     }
 });
 
 // ==================== ENDPOINT: /api/server/status ====================
-// Altyapı durumu bu endpoint'te
 app.get('/api/server/status', serverStatusRateLimit, async (req, res) => {
-    // GÜVENLİK: CORS kontrolü
     const origin = req.headers.origin;
     if (origin) {
-        if (allowedOrigins.length === 0) {
-            const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
-            if (!devRegex.test(origin)) {
-                return res.status(403).json({
-                    success: false,
-                    error: 'Access denied',
-                    message: 'Not allowed by CORS - only localhost allowed in development'
-                });
-            }
-        } else {
-            if (!allowedOrigins.includes(origin)) {
-                return res.status(403).json({
-                    success: false,
-                    error: 'Access denied',
-                    message: 'Not allowed by CORS'
-                });
-            }
+        const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+        if (!allowedOrigins.includes(origin) && !devRegex.test(origin) && !origin.includes('.onrender.com')) {
+            return res.status(403).json({
+                success: false,
+                error: 'Access denied',
+                message: 'Not allowed by CORS'
+            });
         }
     } else if (process.env.NODE_ENV === 'production') {
         return res.status(403).json({
@@ -414,7 +362,6 @@ app.get('/api/server/status', serverStatusRateLimit, async (req, res) => {
 
     try {
         const infraStatus = await checkInfrastructureStatus();
-
         res.json({
             success: true,
             data: {
@@ -427,16 +374,16 @@ app.get('/api/server/status', serverStatusRateLimit, async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to fetch server status',
-            message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+            message: 'Internal server error'
         });
     }
 });
 
-// Health check endpoint (opsiyonel)
+// Health check endpoint
 app.get('/', (req, res) => {
     res.json({
         status: 'online',
-        message: 'Discord Bot Status API',
+        message: 'Discord Bot Status API - AslanOyun',
         version: '1.0.0'
     });
 });
@@ -455,5 +402,4 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔐 CORS enabled for: ${process.env.FRONTEND_URL || 'localhost'}`);
 });

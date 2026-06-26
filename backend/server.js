@@ -379,13 +379,8 @@ app.get('/api/server/status', serverStatusRateLimit, async (req, res) => {
     }
 });
 
-// Health check endpoint
 app.get('/', (req, res) => {
-    res.json({
-        status: 'online',
-        message: 'Discord Bot Status API - AslanOyun',
-        version: '1.0.0'
-    });
+    res.redirect('https://aslanoyunsite.onrender.com');
 });
 
 // Error handling middleware

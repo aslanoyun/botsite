@@ -11,21 +11,15 @@ try {
     console.warn('⚠️  Helmet.js yüklü değil. Güvenlik için yükleyin: npm install helmet');
 }
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
 // ==================== RATE LIMITING ====================
-// Her endpoint için ayrı rate limit map'leri
 const botStatsRateLimitMap = new Map();
 const serverStatusRateLimitMap = new Map();
 
-// Rate limit ayarları
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 dakika
-const RATE_LIMIT_BAN_DURATION = 2 * 60 * 1000; // 2 dakika ban süresi
-const BOT_STATS_MAX_REQUESTS = 10; // 1 dakikada maksimum 10 istek
-const SERVER_STATUS_MAX_REQUESTS = 5; // 1 dakikada maksimum 5 istek
+const RATE_LIMIT_WINDOW = 60 * 1000;
+const RATE_LIMIT_BAN_DURATION = 2 * 60 * 1000;
+const BOT_STATS_MAX_REQUESTS = 10;
+const SERVER_STATUS_MAX_REQUESTS = 5;
 
-// Rate limit middleware factory
 function createRateLimitMiddleware(rateLimitMap, maxRequests, endpointName) {
     return (req, res, next) => {
         const clientId = req.ip || req.connection.remoteAddress;
@@ -42,7 +36,6 @@ function createRateLimitMiddleware(rateLimitMap, maxRequests, endpointName) {
 
         const limitData = rateLimitMap.get(clientId);
 
-        // Ban kontrolü
         if (limitData.bannedUntil && now < limitData.bannedUntil) {
             const remainingTime = Math.ceil((limitData.bannedUntil - now) / 1000);
             return res.status(429).json({
@@ -53,14 +46,12 @@ function createRateLimitMiddleware(rateLimitMap, maxRequests, endpointName) {
             });
         }
 
-        // Ban süresi dolmuşsa sıfırla
         if (limitData.bannedUntil && now >= limitData.bannedUntil) {
             limitData.bannedUntil = null;
             limitData.count = 0;
             limitData.windowStart = now;
         }
 
-        // Yeni window başladıysa sıfırla
         if (now - limitData.windowStart >= RATE_LIMIT_WINDOW) {
             limitData.count = 1;
             limitData.windowStart = now;
@@ -68,9 +59,7 @@ function createRateLimitMiddleware(rateLimitMap, maxRequests, endpointName) {
             return next();
         }
 
-        // Rate limit kontrolü
         if (limitData.count >= maxRequests) {
-            // Ban uygula
             limitData.bannedUntil = now + RATE_LIMIT_BAN_DURATION;
             const remainingTime = Math.ceil(RATE_LIMIT_BAN_DURATION / 1000);
             return res.status(429).json({
@@ -86,16 +75,13 @@ function createRateLimitMiddleware(rateLimitMap, maxRequests, endpointName) {
     };
 }
 
-// Endpoint-specific rate limit middleware'leri
 const botStatsRateLimit = createRateLimitMiddleware(botStatsRateLimitMap, BOT_STATS_MAX_REQUESTS, 'bot-stats');
 const serverStatusRateLimit = createRateLimitMiddleware(serverStatusRateLimitMap, SERVER_STATUS_MAX_REQUESTS, 'server-status');
 
-// Eski kayıtları temizle (memory leak önleme)
 setInterval(() => {
     const now = Date.now();
     const cleanup = (map) => {
         for (const [key, value] of map.entries()) {
-            // Ban süresi dolmuş ve window süresi geçmişse sil
             if ((!value.bannedUntil || now >= value.bannedUntil) &&
                 (now - value.windowStart >= RATE_LIMIT_WINDOW + RATE_LIMIT_BAN_DURATION)) {
                 map.delete(key);
@@ -104,32 +90,30 @@ setInterval(() => {
     };
     cleanup(botStatsRateLimitMap);
     cleanup(serverStatusRateLimitMap);
-}, 5 * 60 * 1000); // Her 5 dakikada bir temizle
+}, 5 * 60 * 1000);
 
-// CORS Configuration
-const allowedOrigins = [];
+// ==================== CORS AYARLARI (GÜNCELLENDİ) ====================
+const allowedOrigins = [
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'http://localhost:3000',
+    'https://aslanbotsite.onrender.com'
+];
+
 if (process.env.FRONTEND_URL) {
     allowedOrigins.push(process.env.FRONTEND_URL);
 }
 
 const corsOptions = {
     origin: function (origin, callback) {
+        // Render'ın veya local sunucuların botsuz/originsiz isteklerine üretimde de izin veriyoruz
         if (!origin) {
-            if (process.env.NODE_ENV === 'production') {
-                return callback(new Error('Origin required in production'));
-            }
             return callback(null, true);
         }
 
-        if (allowedOrigins.length === 0) {
-            const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
-            if (devRegex.test(origin)) {
-                return callback(null, true);
-            }
-            return callback(new Error('Not allowed by CORS - only localhost allowed in development'));
-        }
-
-        if (allowedOrigins.includes(origin)) {
+        // İstek atan site izin verilenler listesindeyse veya local regex'e uyuyorsa onay ver
+        const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+        if (allowedOrigins.includes(origin) || devRegex.test(origin) || origin.includes('.onrender.com')) {
             return callback(null, true);
         }
 
@@ -139,13 +123,13 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 
-// GÜVENLİK: Helmet.js - Security headers
+// ==================== GÜVENLİK HEADERS ====================
 if (helmet) {
     app.use(helmet({
         contentSecurityPolicy: {
             directives: {
                 defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", "'unsafe-inline'"], // Inline script'ler için gerekli (güvenlik açığı oluşturur ama çalışır)
+                scriptSrc: ["'self'", "'unsafe-inline'"],
                 styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
                 fontSrc: ["'self'", "https://fonts.gstatic.com"],
                 imgSrc: ["'self'", "data:"],
@@ -154,7 +138,6 @@ if (helmet) {
         }
     }));
 } else {
-    // Helmet.js yoksa manuel security headers ekle
     app.use((req, res, next) => {
         res.setHeader('X-Content-Type-Options', 'nosniff');
         res.setHeader('X-Frame-Options', 'DENY');

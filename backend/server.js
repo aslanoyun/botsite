@@ -11,7 +11,6 @@ try {
     console.warn('⚠️  Helmet.js yüklü değil. Güvenlik için yükleyin: npm install helmet');
 }
 
-// 🟢 CRITICAL FIX: Unutulan express uygulamasını burada başlattık!
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -110,13 +109,12 @@ if (process.env.FRONTEND_URL) {
 
 const corsOptions = {
     origin: function (origin, callback) {
-        // Eğer istek başlığı yoksa (Render iç servisleri veya test araçları) izin ver
+        // Tarayıcı içi doğrudan erişim veya origin göndermeyen isteklerde güvenlik kilidini açıyoruz
         if (!origin) {
             return callback(null, true);
         }
 
         const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
-        // İzin verilen adresler, localhost veya onrender.com uzantılı sitelere izin ver
         if (allowedOrigins.includes(origin) || devRegex.test(origin) || origin.includes('.onrender.com')) {
             return callback(null, true);
         }
@@ -136,7 +134,7 @@ if (helmet) {
                 scriptSrc: ["'self'", "'unsafe-inline'"],
                 styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
                 fontSrc: ["'self'", "https://fonts.gstatic.com"],
-                imgSrc: ["'self'", "data:"],
+                imgSrc: ["'self'", "data:", "https://*"],
                 connectSrc: ["'self'", "http://localhost:3000", "https://*.onrender.com", "https://*.vercel.app", "https://*.netlify.app", "https://www.githubstatus.com", "https://discordstatus.com", "https://discord.com"]
             }
         }
@@ -162,7 +160,6 @@ const BOT_START_TIME = process.env.BOT_START_TIMESTAMP
     ? new Date(process.env.BOT_START_TIMESTAMP)
     : new Date();
 
-// Helper function to fetch from Discord API
 async function fetchDiscordAPI(endpoint) {
     try {
         const response = await fetch(`${DISCORD_API}${endpoint}`, {
@@ -231,24 +228,7 @@ async function checkInfrastructureStatus() {
 
 // ==================== ENDPOINT: /api/bot/stats ====================
 app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
-    const origin = req.headers.origin;
-    if (origin) {
-        const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
-        if (!allowedOrigins.includes(origin) && !devRegex.test(origin) && !origin.includes('.onrender.com')) {
-            return res.status(403).json({
-                success: false,
-                error: 'Access denied',
-                message: 'Not allowed by CORS'
-            });
-        }
-    } else if (process.env.NODE_ENV === 'production') {
-        return res.status(403).json({
-            success: false,
-            error: 'Access denied',
-            message: 'Origin required in production'
-        });
-    }
-
+    // 🟢 FIX: İstekleri engelleyen production köken zorunluluğu kaldırıldı.
     try {
         let infraStatus;
         try {
@@ -269,32 +249,31 @@ app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
         let botOnline = false;
 
         try {
-            try {
-                botData = await fetchDiscordAPI('/users/@me');
-                botOnline = true;
-            } catch (err) {
-                console.error('Bot data fetch error:', err.message);
-                botData = { id: 'unknown', username: 'Unknown', discriminator: '0000', avatar: null, verified: false };
-            }
+            if (process.env.DISCORD_BOT_TOKEN) {
+                try {
+                    botData = await fetchDiscordAPI('/users/@me');
+                    botOnline = true;
+                } catch (err) {
+                    console.error('Bot data fetch error:', err.message);
+                }
 
-            try {
-                const guildsData = await fetchDiscordAPI('/users/@me/guilds');
-                guilds = guildsData || [];
-            } catch (err) {
-                console.error('Guilds fetch error:', err.message);
-                guilds = [];
-            }
+                try {
+                    const guildsData = await fetchDiscordAPI('/users/@me/guilds');
+                    guilds = guildsData || [];
+                } catch (err) {
+                    console.error('Guilds fetch error:', err.message);
+                }
 
-            try {
-                const latencyStart = Date.now();
-                await fetchDiscordAPI('/gateway');
-                latency = Date.now() - latencyStart;
-            } catch (err) {
-                console.error('Gateway fetch error:', err.message);
-                latency = 0;
+                try {
+                    const latencyStart = Date.now();
+                    await fetchDiscordAPI('/gateway');
+                    latency = Date.now() - latencyStart;
+                } catch (err) {
+                    console.error('Gateway fetch error:', err.message);
+                }
             }
         } catch (error) {
-            console.error('Discord API error:', error.message);
+            console.error('Discord API ana işleme hatası:', error.message);
         }
 
         res.json({
@@ -315,51 +294,24 @@ app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Bot stats error:', error);
-        try {
-            const infraStatus = await checkInfrastructureStatus();
-            res.json({
-                success: true,
-                data: {
-                    bot: null,
-                    status: { online: false, latency: 0 },
-                    guilds: { count: 0 },
-                    infrastructure: infraStatus,
-                    uptime: { startTime: BOT_START_TIME.toISOString() },
-                    timestamp: new Date().toISOString()
-                }
-            });
-        } catch (infraError) {
-            console.error('Complete failure:', infraError);
-            res.status(500).json({
-                success: false,
-                error: 'Failed to fetch bot stats',
-                message: 'Internal server error'
-            });
-        }
+        console.error('Bot stats ana hata bloğu:', error);
+        const infraStatus = await checkInfrastructureStatus().catch(() => ({ github: 'critical', discord: 'critical', bot: 'critical' }));
+        res.json({
+            success: true,
+            data: {
+                bot: null,
+                status: { online: false, latency: 0 },
+                guilds: { count: 0 },
+                infrastructure: infraStatus,
+                uptime: { startTime: BOT_START_TIME.toISOString() },
+                timestamp: new Date().toISOString()
+            }
+        });
     }
 });
 
 // ==================== ENDPOINT: /api/server/status ====================
 app.get('/api/server/status', serverStatusRateLimit, async (req, res) => {
-    const origin = req.headers.origin;
-    if (origin) {
-        const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
-        if (!allowedOrigins.includes(origin) && !devRegex.test(origin) && !origin.includes('.onrender.com')) {
-            return res.status(403).json({
-                success: false,
-                error: 'Access denied',
-                message: 'Not allowed by CORS'
-            });
-        }
-    } else if (process.env.NODE_ENV === 'production') {
-        return res.status(403).json({
-            success: false,
-            error: 'Access denied',
-            message: 'Origin required in production'
-        });
-    }
-
     try {
         const infraStatus = await checkInfrastructureStatus();
         res.json({
@@ -370,19 +322,16 @@ app.get('/api/server/status', serverStatusRateLimit, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Server status error:', error);
+        console.error('Server status hatası:', error);
         res.status(500).json({
             success: false,
-            error: 'Failed to fetch server status',
-            message: 'Internal server error'
+            error: 'Failed to fetch server status'
         });
     }
 });
 
-// Eski app.get('/', ...) kodunu ve eğer eklediysen path/static kodlarını sil, yerine bunu yapıştır:
+// ==================== FRONTEND DOSYALARI SUNUMU ====================
 const path = require('path');
-
-// Express'in dosya arayacağı frontend klasörünü tam nokta atışı tanımlıyoruz
 const frontendPath = path.resolve(__dirname, '..');
 
 app.use(express.static(frontendPath));
@@ -390,24 +339,19 @@ app.use(express.static(frontendPath));
 app.get('/', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'), (err) => {
         if (err) {
-            console.error("index.html gönderilirken hata oluştu kanka:", err);
-            res.status(404).send("Kanka index.html dosyan ana klasörde bulunamadı! Dosya adını ve yerini kontrol et.");
+            res.status(404).send("index.html bulunamadı kanka.");
         }
     });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
-    console.error('Error:', err.stack);
+    console.error('Global Error:', err.stack);
     res.status(500).json({
         success: false,
-        error: 'Internal server error',
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+        error: 'Internal server error'
     });
 });
 
-// Start server
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
 });

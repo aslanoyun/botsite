@@ -379,8 +379,21 @@ app.get('/api/server/status', serverStatusRateLimit, async (req, res) => {
     }
 });
 
+// Eski app.get('/', ...) kodunu ve eğer eklediysen path/static kodlarını sil, yerine bunu yapıştır:
+const path = require('path');
+
+// Express'in dosya arayacağı frontend klasörünü tam nokta atışı tanımlıyoruz
+const frontendPath = path.resolve(__dirname, '..');
+
+app.use(express.static(frontendPath));
+
 app.get('/', (req, res) => {
-    res.redirect('https://aslanoyunsite.onrender.com');
+    res.sendFile(path.join(frontendPath, 'index.html'), (err) => {
+        if (err) {
+            console.error("index.html gönderilirken hata oluştu kanka:", err);
+            res.status(404).send("Kanka index.html dosyan ana klasörde bulunamadı! Dosya adını ve yerini kontrol et.");
+        }
+    });
 });
 
 // Error handling middleware

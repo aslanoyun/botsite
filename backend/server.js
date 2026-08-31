@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
 
-// GÜVENLİK: Helmet.js - Security headers için
 let helmet;
 try {
     helmet = require('helmet');
@@ -14,7 +13,6 @@ try {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ==================== RATE LIMITING ====================
 const botStatsRateLimitMap = new Map();
 const serverStatusRateLimitMap = new Map();
 
@@ -95,7 +93,6 @@ setInterval(() => {
     cleanup(serverStatusRateLimitMap);
 }, 5 * 60 * 1000);
 
-// ==================== CORS AYARLARI ====================
 const allowedOrigins = [
     'http://localhost:5500',
     'http://127.0.0.1:5500',
@@ -109,7 +106,6 @@ if (process.env.FRONTEND_URL) {
 
 const corsOptions = {
     origin: function (origin, callback) {
-        // Tarayıcı içi doğrudan erişim veya origin göndermeyen isteklerde güvenlik kilidini açıyoruz
         if (!origin) {
             return callback(null, true);
         }
@@ -125,7 +121,6 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 
-// ==================== GÜVENLİK HEADERS ====================
 if (helmet) {
     app.use(helmet({
         contentSecurityPolicy: {
@@ -152,13 +147,11 @@ if (helmet) {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Discord API Base URL
 const DISCORD_API = 'https://discord.com/api/v10';
 
-// Bot Start Time
 const BOT_START_TIME = process.env.BOT_START_TIMESTAMP
     ? new Date(process.env.BOT_START_TIMESTAMP)
-    : new Date();
+    : new Date('2026-08-15T00:00:00.000Z');
 
 async function fetchDiscordAPI(endpoint) {
     try {
@@ -180,7 +173,6 @@ async function fetchDiscordAPI(endpoint) {
     }
 }
 
-// Helper function: Altyapı durumunu kontrol et
 async function checkInfrastructureStatus() {
     const services = {
         github: 'https://www.githubstatus.com/api/v2/status.json',
@@ -226,9 +218,7 @@ async function checkInfrastructureStatus() {
     };
 }
 
-// ==================== ENDPOINT: /api/bot/stats ====================
 app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
-    // 🟢 FIX: İstekleri engelleyen production köken zorunluluğu kaldırıldı.
     try {
         let infraStatus;
         try {
@@ -310,7 +300,6 @@ app.get('/api/bot/stats', botStatsRateLimit, async (req, res) => {
     }
 });
 
-// ==================== ENDPOINT: /api/server/status ====================
 app.get('/api/server/status', serverStatusRateLimit, async (req, res) => {
     try {
         const infraStatus = await checkInfrastructureStatus();
@@ -330,7 +319,6 @@ app.get('/api/server/status', serverStatusRateLimit, async (req, res) => {
     }
 });
 
-// ==================== FRONTEND DOSYALARI SUNUMU ====================
 const path = require('path');
 const frontendPath = path.resolve(__dirname, '..');
 
@@ -339,7 +327,7 @@ app.use(express.static(frontendPath));
 app.get('/', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'), (err) => {
         if (err) {
-            res.status(404).send("index.html bulunamadı kanka.");
+            res.status(404).send("index.html bulunamadı.");
         }
     });
 });

@@ -1,253 +1,588 @@
-<!doctype html>
-<html lang="tr">
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Aslan Bot Status - 7/24 Aktif" />
-  <!-- Content Security Policy backend'de (Helmet.js) yönetiliyor -->
-  <title>Aslan Bot Status</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Aslan Bot - Gerçek zamanlı bot durumu, performans metrikleri ve altyapı durumu." />
+  <meta name="theme-color" content="#0d0e12" />
+  <title>Aslan Bot - Sistem Durumu</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="container">
-      <div class="nav-brand">
-        <div class="bot-logo">🤖</div>
-        <h1 class="bot-name" data-tr="Aslan Bot" data-en="Aslan Bot">
-          Aslan Bot
+  <div class="tech-grid-pattern"></div>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <div class="navbar-wrapper">
+    <nav class="navbar" aria-label="Main Navigation">
+      <div class="navbar-inner">
+        <a href="#home" class="nav-brand">
+          <div class="brand-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+              <circle cx="8.5" cy="16" r="1.5"></circle>
+              <circle cx="15.5" cy="16" r="1.5"></circle>
+              <path d="M12 2v4"></path>
+              <path d="M8 7h8"></path>
+              <path d="M2 14h1"></path>
+              <path d="M21 14h1"></path>
+            </svg>
+          </div>
+          <div class="brand-name">
+            <span data-tr="Aslan Bot" data-en="Aslan Bot">Aslan Bot</span>
+          </div>
+        </a>
+
+        <div class="nav-links">
+          <a href="#home" class="nav-link active" data-tr="Ana Sayfa" data-en="Home">Ana Sayfa</a>
+          <a href="#bot-durumu" class="nav-link" data-tr="Bot Durumu" data-en="Bot Status">Bot Durumu</a>
+          <a href="#faq" class="nav-link" data-tr="SSS" data-en="FAQ">SSS</a>
+          <a href="#iletisim" class="nav-link" data-tr="İletişim" data-en="Contact">İletişim</a>
+        </div>
+
+        <div class="nav-controls">
+          <button class="control-btn" id="soundToggle" aria-label="Ses Efektlerini Aç/Kapat" title="Ses Efektleri">
+            <span id="soundIcon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+            </span>
+          </button>
+
+          <button class="control-btn" id="langToggle" aria-label="Dili Değiştir / Switch Language">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+              </path>
+            </svg>
+            <span class="lang-text">EN</span>
+          </button>
+
+          <button class="control-btn" id="themeToggle" aria-label="Temayı Değiştir / Toggle Theme">
+            <span class="theme-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="m4.93 4.93 1.41 1.41"></path>
+                <path d="m17.66 17.66 1.41 1.41"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="m6.34 17.66-1.41 1.41"></path>
+                <path d="m19.07 4.93-1.41 1.41"></path>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <main>
+    <section id="home" class="fullscreen-section hero">
+      <div class="container">
+        <div class="hero-pill">
+          <span class="hero-pill-dot"></span>
+          <span data-tr="Canlı Sistem & Ağ Durumu" data-en="Live System & Network Status">Canlı Sistem & Ağ
+            Durumu</span>
+        </div>
+
+        <h1 class="hero-title">
+          <span data-tr="Aslan Bot" data-en="Aslan Bot">Aslan Bot</span> -
+          <span class="gradient-text" data-tr="Sistem Durumu" data-en="System Status">Sistem Durumu</span>
         </h1>
-      </div>
-      <div class="nav-controls">
-        <button class="lang-toggle" id="langToggle">
-          <span class="lang-icon">🌐</span>
-          <span class="lang-text">EN</span>
-        </button>
-        <button class="theme-toggle" id="themeToggle">
-          <span class="theme-icon">🌙</span>
-        </button>
-      </div>
-    </div>
-  </nav>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <h2 class="hero-title" data-tr="Bot Durumu" data-en="Bot Status">
-          Bot Durumu
-        </h2>
-        <p class="hero-subtitle" data-tr="7/24 Aktif Discord Botu" data-en="24/7 Active Discord Bot">
-          7/24 Aktif Discord Botu
+        <p class="hero-subtitle" data-tr="Gerçek zamanlı bot durumu, performans metrikleri ve altyapı durumu."
+          data-en="Real-time bot status, performance metrics, and infrastructure status.">
+          Gerçek zamanlı bot durumu, performans metrikleri ve altyapı durumu.
         </p>
-      </div>
-    </div>
-  </section>
 
-  <!-- Main Bot Status -->
-  <section class="bot-status">
-    <div class="container">
-      <div class="status-grid">
-        <!-- Online Status -->
-        <div class="status-card">
-          <div class="status-icon online">
-            <span class="pulse"></span>
-            <span>✓</span>
-          </div>
-          <h3 data-tr="Durum" data-en="Status">Durum</h3>
-          <p class="status-value" id="botStatus" data-tr="Çevrimiçi" data-en="Online">
-            Çevrimiçi
-          </p>
+        <div class="hero-actions">
+          <a href="https://discord.com/oauth2/authorize?client_id=1283427710370058331" target="_blank"
+            rel="noopener noreferrer" class="btn-primary interactive-sound">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            <span data-tr="Botu Davet Et" data-en="Invite Bot">Botu Davet Et</span>
+          </a>
         </div>
 
-        <!-- Infrastructure Status -->
-        <div class="status-card">
-          <div class="status-icon infrastructure-status">
-            <span>🩺</span>
+        <div class="hero-highlights">
+          <div class="highlight-box">
+            <div class="highlight-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div>
+              <div class="highlight-val" id="uptime30d">%99.85</div>
+              <div class="highlight-lbl" data-tr="Son 30 Gün Uptime" data-en="Last 30 Days Uptime">Son 30 Gün Uptime
+              </div>
+            </div>
           </div>
-          <h3 data-tr="Genel Durum" data-en="System Status">Genel Durum</h3>
-          <p class="status-value" id="systemStatus" style="font-size: 24px;">--</p>
-          <p class="status-detail" id="systemDetail" data-tr="Kontrol Ediliyor..." data-en="Checking...">
-            Kontrol Ediliyor...
-          </p>
-        </div>
 
-        <!-- Ping -->
-        <div class="status-card">
-          <div class="status-icon ping">
-            <span>📡</span>
+          <div class="highlight-box">
+            <div class="highlight-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <div>
+              <div class="highlight-val" id="avgLatencyText">&lt; 45ms</div>
+              <div class="highlight-lbl" data-tr="Ortalama Yanıt" data-en="Avg Response">Ortalama Yanıt</div>
+            </div>
           </div>
-          <h3 data-tr="Ping" data-en="Ping">Ping</h3>
-          <p class="status-value" id="ping">45ms</p>
-          <p class="status-detail" data-tr="Düşük Gecikme" data-en="Low Latency">
-            Düşük Gecikme
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Server Infrastructure Status -->
-  <section class="infrastructure">
-    <div class="container">
-      <h2 class="section-title" data-tr="Altyapı Durumu" data-en="Infrastructure Status">
-        Altyapı Durumu
-      </h2>
-      <div class="infrastructure-grid">
-        <!-- Bot Servers -->
-        <div class="infra-card">
-          <div class="infra-header">
-            <div class="infra-icon bot">
-              <span>🤖</span>
+          <div class="highlight-box">
+            <div class="highlight-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
             </div>
-            <div class="infra-title-group">
-              <h3 data-tr="Bot Sunucuları" data-en="Bot Servers">
-                Bot Sunucuları
-              </h3>
-              <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+            <div>
+              <div class="highlight-val" id="liveUptimeText">Hesaplanıyor...</div>
+              <div class="highlight-lbl" data-tr="Canlı Çalışma Süresi" data-en="Live Runtime Clock">Canlı Çalışma
+                Süresi</div>
             </div>
-          </div>
-          <div class="infra-status">
-            <p class="infra-detail" data-tr="Tam performansta çalışıyor" data-en="Running at full performance">
-              Tüm sistemler çalışıyor
-            </p>
-          </div>
-        </div>
-
-        <!-- Discord Servers -->
-        <div class="infra-card">
-          <div class="infra-header">
-            <div class="infra-icon discord">
-              <span>💬</span>
-            </div>
-            <div class="infra-title-group">
-              <h3 data-tr="Discord Sunucuları" data-en="Discord Servers">
-                Discord Sunucuları
-              </h3>
-              <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
-            </div>
-          </div>
-          <div class="infra-status">
-            <p class="infra-detail" data-tr="Bağlantı sağlıklı" data-en="Connection healthy">
-              Tüm sistemler çalışıyor
-            </p>
-          </div>
-        </div>
-
-        <!-- GitHub Servers -->
-        <div class="infra-card">
-          <div class="infra-header">
-            <div class="infra-icon github">
-              <span>🐙</span>
-            </div>
-            <div class="infra-title-group">
-              <h3 data-tr="GitHub Sunucuları" data-en="GitHub Servers">
-                GitHub Sunucuları
-              </h3>
-              <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
-            </div>
-          </div>
-          <div class="infra-status">
-            <p class="infra-detail" data-tr="Tüm sistemler çalışıyor" data-en="All systems operational">
-              Tüm sistemler çalışıyor
-            </p>
-          </div>
-        </div>
-
-        <!-- API Servers -->
-        <div class="infra-card">
-          <div class="infra-header">
-            <div class="infra-icon api">
-              <span>⚡</span>
-            </div>
-            <div class="infra-title-group">
-              <h3 data-tr="API Sunucuları" data-en="API Servers">
-                API Sunucuları
-              </h3>
-              <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
-            </div>
-          </div>
-          <div class="infra-status">
-            <p class="infra-detail" data-tr="Hızlı yanıt süresi" data-en="Fast response time">
-              Tüm sistemler çalışıyor
-            </p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Support Section -->
-  <section class="support">
-    <div class="container">
-      <h2 class="section-title" data-tr="İletişim & Destek" data-en="Contact & Support">
-        İletişim & Destek
-      </h2>
-      <div class="support-grid">
-        <!-- Youtube Card -->
-        <div class="support-card">
-          <div class="support-icon">🎬</div>
-          <h3 data-tr="YouTube Kanalımız" data-en="YouTube Channel">
-            YouTube Kanalımız
-          </h3>
-          <p data-tr="Kanalımıza abone olun" data-en="Subscribe to our channel">
-            Kanalımıza abone olun
-          </p>
-          <a href="https://www.youtube.com/@AslanOyun1" target="_blank" class="support-link" data-tr="Abone Ol"
-            data-en="Subscribe">Abone Ol</a>
+    <section id="bot-durumu" class="fullscreen-section" aria-labelledby="status-overview-title">
+      <div class="container">
+        <div class="section-header">
+          <h2 id="status-overview-title" class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            <span data-tr="Performans Metrikleri" data-en="Performance Metrics">Performans Metrikleri</span>
+          </h2>
         </div>
 
-        <!-- Discord Card -->
-        <div class="support-card">
-          <div class="support-icon">💬</div>
-          <h3 data-tr="Discord Sunucusu" data-en="Discord Server">
-            Discord Sunucusu
-          </h3>
-          <p data-tr="Topluluğumuza katılın" data-en="Join our community">
-            Topluluğumuza katılın
-          </p>
-          <a href="https://discord.gg/d6RGBkFUj3" target="_blank" class="support-link" data-tr="Katıl"
-            data-en="Join">Katıl</a>
+        <div class="status-grid">
+          <div class="glass-card status-card">
+            <div class="metric-card-inner">
+              <div class="metric-header">
+                <div class="metric-icon-box status-icon online">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path
+                      d="M12 2a4 4 0 0 0-4 4v1H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z">
+                    </path>
+                    <circle cx="9" cy="13" r="1.5"></circle>
+                    <circle cx="15" cy="13" r="1.5"></circle>
+                  </svg>
+                </div>
+                <span class="metric-tag" data-tr="AKTİFLİK" data-en="BOT UPTIME">BOT UPTIME</span>
+              </div>
+              <div class="metric-label" data-tr="Bot Durumu" data-en="Bot Status">Bot Durumu</div>
+              <div class="metric-value" id="botStatus" data-tr="Çevrimiçi" data-en="Online">Çevrimiçi</div>
+              <div class="metric-footer">
+                <span class="status-beacon beacon-online"></span>
+                <span data-tr="7/24 Kesintisiz Aktif" data-en="24/7 Active & Running">7/24 Kesintisiz Aktif</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card status-card">
+            <div class="metric-card-inner">
+              <div class="metric-header">
+                <div class="metric-icon-box status-icon infrastructure-status">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
+                </div>
+                <span class="metric-tag" data-tr="ALTYAPI SAĞLIĞI" data-en="INFRA HEALTH">ALTYAPI SAĞLIĞI</span>
+              </div>
+              <div class="metric-label" data-tr="Sistem Durumu" data-en="System Status">Sistem Durumu</div>
+              <div class="metric-value" id="systemStatus">Sistem Normal</div>
+              <div class="metric-footer">
+                <span class="status-detail" id="systemDetail" data-tr="Tüm servisler aktif"
+                  data-en="All services active">
+                  Tüm servisler aktif
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card status-card">
+            <div class="metric-card-inner">
+              <div class="metric-header">
+                <div class="metric-icon-box status-icon ping">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M2 20h.01"></path>
+                    <path d="M7 20v-4"></path>
+                    <path d="M12 20v-8"></path>
+                    <path d="M17 20V8"></path>
+                    <path d="M22 4v16"></path>
+                  </svg>
+                </div>
+                <span class="metric-tag" data-tr="GECİKME" data-en="LATENCY">GECİKME</span>
+              </div>
+              <div class="metric-label" data-tr="Gateway Gecikmesi" data-en="Gateway Latency">Gateway Gecikmesi</div>
+              <div class="metric-value" id="ping">45ms</div>
+              <div class="metric-footer">
+                <span class="status-detail" data-tr="Düşük Gecikme" data-en="Low Latency">Düşük Gecikme</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Email Card -->
-        <div class="support-card">
-          <div class="support-icon">📩</div>
-          <h3 data-tr="E-posta" data-en="Email">E-posta</h3>
-          <p data-tr="Bizimle iletişime geçin" data-en="Get in touch with us">
-            Bizimle iletişime geçin
-          </p>
-          <a href="mailto:aslanoyun36@gmail.com" class="support-link">aslanoyun36@gmail.com</a>
+        <div>
+          <div class="section-header">
+            <h2 class="section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect>
+                <rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect>
+                <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                <line x1="6" y1="18" x2="6.01" y2="18"></line>
+              </svg>
+              <span data-tr="Altyapı Servis Düğümleri" data-en="Infrastructure Service Nodes">Altyapı Servis
+                Düğümleri</span>
+            </h2>
+          </div>
+
+          <div class="infra-grid">
+            <div class="glass-card infra-card">
+              <div class="infra-top">
+                <div class="infra-ident">
+                  <div class="infra-logo-box infra-icon bot">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                      stroke-linejoin="round">
+                      <rect width="18" height="12" x="3" y="6" rx="2"></rect>
+                      <circle cx="9" cy="12" r="1.2"></circle>
+                      <circle cx="15" cy="12" r="1.2"></circle>
+                      <path d="M12 2v4"></path>
+                    </svg>
+                  </div>
+                  <h3 class="infra-name" data-tr="Bot Sunucuları" data-en="Bot Servers">Bot Sunucuları</h3>
+                </div>
+                <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+              </div>
+              <div class="infra-bar-wrap">
+                <div class="infra-bar-fill"></div>
+              </div>
+              <p class="infra-desc infra-detail" data-tr="Tam performansta çalışıyor"
+                data-en="Running at full performance">
+                Tüm sistemler çalışıyor
+              </p>
+            </div>
+
+            <div class="glass-card infra-card">
+              <div class="infra-top">
+                <div class="infra-ident">
+                  <div class="infra-logo-box infra-icon discord">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                      stroke-linejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                  </div>
+                  <h3 class="infra-name" data-tr="Discord Sunucuları" data-en="Discord Servers">Discord Sunucuları</h3>
+                </div>
+                <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+              </div>
+              <div class="infra-bar-wrap">
+                <div class="infra-bar-fill"></div>
+              </div>
+              <p class="infra-desc infra-detail" data-tr="Bağlantı sağlıklı" data-en="Connection healthy">
+                Tüm sistemler çalışıyor
+              </p>
+            </div>
+
+            <div class="glass-card infra-card">
+              <div class="infra-top">
+                <div class="infra-ident">
+                  <div class="infra-logo-box infra-icon github">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                      stroke-linejoin="round">
+                      <path
+                        d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4">
+                      </path>
+                      <path d="M9 18c-4.51 2-5-2-7-2"></path>
+                    </svg>
+                  </div>
+                  <h3 class="infra-name" data-tr="GitHub Sunucuları" data-en="GitHub Servers">GitHub Sunucuları</h3>
+                </div>
+                <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+              </div>
+              <div class="infra-bar-wrap">
+                <div class="infra-bar-fill"></div>
+              </div>
+              <p class="infra-desc infra-detail" data-tr="Tüm sistemler çalışıyor" data-en="All systems operational">
+                Tüm sistemler çalışıyor
+              </p>
+            </div>
+
+            <div class="glass-card infra-card">
+              <div class="infra-top">
+                <div class="infra-ident">
+                  <div class="infra-logo-box infra-icon api">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                      stroke-linejoin="round">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                  </div>
+                  <h3 class="infra-name" data-tr="API Sunucuları" data-en="API Servers">API Sunucuları</h3>
+                </div>
+                <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+              </div>
+              <div class="infra-bar-wrap">
+                <div class="infra-bar-fill"></div>
+              </div>
+              <p class="infra-desc infra-detail" data-tr="Hızlı yanıt süresi" data-en="Fast response time">
+                Tüm sistemler çalışıyor
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="faq" class="fullscreen-section" aria-labelledby="faq-title">
+      <div class="container">
+        <div class="section-header" style="justify-content: center; text-align: center; margin-bottom: 32px;">
+          <h2 id="faq-title" class="section-title" style="font-size: 1.8rem;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span data-tr="Sıkça Sorulan Sorular" data-en="Frequently Asked Questions">Sıkça Sorulan Sorular</span>
+          </h2>
+        </div>
+
+        <div class="faq-grid">
+          <div class="faq-item">
+            <button class="faq-question interactive-sound" aria-expanded="false">
+              <span data-tr="Aslan Bot'u sunucuma nasıl ekleyebilirim?"
+                data-en="How can I invite Aslan Bot to my server?">Aslan Bot'u sunucuma nasıl ekleyebilirim?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <p data-tr="Ana sayfadaki 'Botu Davet Et' butonuna tıklayarak veya resmi Discord sunucumuza gelip yetkilendirme linkini kullanarak botu saniyeler içinde sunucunuza ekleyebilirsiniz."
+                data-en="You can add the bot in seconds by clicking the 'Invite Bot' button on the homepage or by using the auth link in our official Discord server.">
+                Ana sayfadaki 'Botu Davet Et' butonuna tıklayarak veya resmi Discord sunucumuza gelip yetkilendirme
+                linkini kullanarak botu saniyeler içinde sunucunuza ekleyebilirsiniz.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question interactive-sound" aria-expanded="false">
+              <span data-tr="Bot neden bazen gecikmeli yanıt verebilir?"
+                data-en="Why does the bot occasionally have latency?">Bot neden bazen gecikmeli yanıt verebilir?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <p data-tr="Discord'un genel sunucu ağında yaşanan anlık dalgalanmalar veya yoğunluk dönemlerinde gecikme (ping) artabilir. Bu durumu 'Bot Durumu' panelimizden anlık olarak takip edebilirsiniz."
+                data-en="Ping can increase during high traffic periods or Discord API rate-limiting spikes. You can track this in real-time from our 'Bot Status' telemetry panel.">
+                Discord'un genel sunucu ağında yaşanan anlık dalgalanmalar veya yoğunluk dönemlerinde gecikme (ping)
+                artabilir. Bu durumu 'Bot Durumu' panelimizden anlık olarak takip edebilirsiniz.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question interactive-sound" aria-expanded="false">
+              <span data-tr="Bot 7/24 kesintisiz mi çalışıyor?" data-en="Is the bot running 24/7 uninterrupted?">Bot
+                7/24 kesintisiz mi çalışıyor?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <p data-tr="Evet, Aslan Bot yüksek erişilebilirlikli bulut sunucuları üzerinde 7/24 kesintisiz olarak barındırılmaktadır ve otomatik yeniden başlatma koruması mevcuttur."
+                data-en="Yes, Aslan Bot is hosted on high-availability cloud servers 24/7 with automated self-healing and restart mechanisms.">
+                Evet, Aslan Bot yüksek erişilebilirlikli bulut sunucuları üzerinde 7/24 kesintisiz olarak
+                barındırılmaktadır ve otomatik yeniden başlatma koruması mevcuttur.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question interactive-sound" aria-expanded="false">
+              <span data-tr="Destek almak veya öneride bulunmak için ne yapmalıyım?"
+                data-en="How can I get support or suggest a feature?">Destek almak veya öneride bulunmak için ne
+                yapmalıyım?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="faq-answer">
+              <p data-tr="Aşağıdaki İletişim bölümünden Discord sunucumuza katılarak doğrudan geliştirici ekibimizle iletişime geçebilir veya e-posta gönderebilirsiniz."
+                data-en="You can join our Discord support server or send us an email through the contact section below to reach our team directly.">
+                Aşağıdaki İletişim bölümünden Discord sunucumuza katılarak doğrudan geliştirici ekibimizle iletişime
+                geçebilir veya e-posta gönderebilirsiniz.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section id="iletisim" class="fullscreen-section" aria-labelledby="community-title">
+      <div class="container">
+        <div class="section-header" style="justify-content: center; text-align: center; margin-bottom: 36px;">
+          <h2 id="community-title" class="section-title" style="font-size: 1.8rem;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span data-tr="İletişim & Topluluk" data-en="Community & Support">İletişim & Topluluk</span>
+          </h2>
+        </div>
+
+        <div class="support-grid">
+          <div class="glass-card support-card">
+            <div class="support-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+            </div>
+            <h3 class="support-title" data-tr="YouTube Kanalımız" data-en="YouTube Channel">YouTube Kanalımız</h3>
+            <p class="support-text" data-tr="Güncellemeler ve videolar için kanalımıza katılın."
+              data-en="Join our channel for updates and tutorials.">
+              Güncellemeler ve videolar için kanalımıza katılın.
+            </p>
+            <a href="https://www.youtube.com/@AslanOyun1" target="_blank" rel="noopener noreferrer"
+              class="support-action-btn interactive-sound">
+              <span data-tr="Abone Ol" data-en="Subscribe">Abone Ol</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+
+          <div class="glass-card support-card">
+            <div class="support-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M18 9a5 5 0 0 0-5-5H7a5 5 0 0 0-5 5v7a5 5 0 0 0 5 5h1v3l4-3h1a5 5 0 0 0 5-5V9z"></path>
+              </svg>
+            </div>
+            <h3 class="support-title" data-tr="Discord Sunucusu" data-en="Discord Server">Discord Sunucusu</h3>
+            <p class="support-text" data-tr="Topluluğumuza katılın ve sorularınızı iletin."
+              data-en="Join our community and get direct support.">
+              Topluluğumuza katılın ve sorularınızı iletin.
+            </p>
+            <a href="https://discord.gg/d6RGBkFUj3" target="_blank" rel="noopener noreferrer"
+              class="support-action-btn interactive-sound">
+              <span data-tr="Sunucuya Katıl" data-en="Join Server">Sunucuya Katıl</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+
+          <div class="glass-card support-card">
+            <div class="support-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+              </svg>
+            </div>
+            <h3 class="support-title" data-tr="E-posta" data-en="Email Support">E-posta</h3>
+            <p class="support-text" data-tr="Özel bildirimler ve iş birlikleri için yazın."
+              data-en="Contact us for partnerships and custom inquiries.">
+              Özel bildirimler ve iş birlikleri için yazın.
+            </p>
+            <a href="mailto:aslanoyun36@gmail.com" class="support-action-btn interactive-sound">
+              <span>aslanoyun36@gmail.com</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <footer class="footer">
-    <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-      <p data-tr="© 2026 Aslan Oyun. Tüm hakları saklıdır." data-en="© 2026 Aslan Oyun. All rights reserved.">
-        © 2026 Aslan Oyun. Tüm hakları saklıdır.
-      </p>
-      <a href="gizlilik.html" style="color: #3b82f6; text-decoration: underline; font-size: 14px; font-weight: 500;">
-        Gizlilik Politikası
-      </a>
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <p data-tr="© 2026 Aslan Oyun. Tüm hakları saklıdır." data-en="© 2026 Aslan Oyun. All rights reserved.">
+          © 2026 Aslan Oyun. Tüm hakları saklıdır.
+        </p>
+      </div>
+      <div class="footer-links">
+        <a href="gizlilik.html" class="footer-link" data-tr="Gizlilik Politikası" data-en="Privacy Policy">
+          Gizlilik Politikası
+        </a>
+      </div>
     </div>
   </footer>
 
-  <!-- Rate Limit Uyarı Toast -->
   <div id="rateLimitToast" class="rate-limit-toast" style="display: none;">
     <div class="toast-content">
-      <span class="toast-icon">⚠️</span>
+      <div class="toast-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
       <span class="toast-message" data-tr="Çok fazla istek gönderildi. Lütfen birkaç dakika bekleyin."
-        data-en="Too many requests. Please wait a few minutes.">Çok fazla istek gönderildi. Lütfen birkaç dakika
-        bekleyin.</span>
-      <button class="toast-close" id="toastClose">×</button>
+        data-en="Too many requests. Please wait a few minutes.">
+        Çok fazla istek gönderildi. Lütfen birkaç dakika bekleyin.
+      </span>
+      <button class="toast-close" id="toastClose" aria-label="Kapat / Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
     </div>
   </div>
 

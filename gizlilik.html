@@ -1,194 +1,392 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aslan Bot - Gizlilik Politikası</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #0f0f14;
-            --card-bg: #161622;
-            --text-color: #cdd6f4;
-            --text-muted: #a6adc8;
-            --accent-color: #f38ba8;
-            --link-color: #3b82f6;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Aslan Bot - Gizlilik Politikası ve Kullanıcı Veri Güvenliği" />
+  <meta name="theme-color" content="#0d0e12" />
+  <title>Aslan Bot - Gizlilik Politikası</title>
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.7;
-            margin: 0;
-            padding: 40px 20px;
-        }
 
-        .privacy-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: var(--card-bg);
-            padding: 40px;
-            border-radius: 16px;
-            border: 1px solid #232336;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-        h1 {
-            color: var(--accent-color);
-            font-size: 32px;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .privacy-wrapper {
+      padding: 100px 0 64px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-        .date {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
+    .privacy-card {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px;
+    }
 
-        hr {
-            border: 0;
-            border-top: 1px solid #232336;
-            margin: 25px 0;
-        }
+    .back-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 24px;
+      transition: all var(--transition-fast);
+    }
 
-        h2 {
-            color: #89b4fa;
-            font-size: 22px;
-            margin-top: 30px;
-            margin-bottom: 15px;
-        }
+    .back-nav-btn:hover {
+      color: var(--amber-primary);
+      border-color: var(--border-hover);
+      transform: translateX(-3px);
+    }
 
-        ul {
-            padding-left: 20px;
-            margin-bottom: 20px;
-        }
+    .privacy-header {
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 20px;
+    }
 
-        li {
-            margin-bottom: 8px;
-        }
+    .privacy-header h1 {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
 
-        p {
-            margin-bottom: 20px;
-        }
+    .privacy-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
 
-        a {
-            color: var(--link-color);
-            text-decoration: none;
-        }
+    .privacy-content h2 {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 30px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        a:hover {
-            text-decoration: underline;
-        }
+    .privacy-content h2::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 18px;
+      background: var(--amber-primary);
+      border-radius: var(--radius-full);
+    }
 
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 30px;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 14px;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
+    .privacy-content p {
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      line-height: 1.7;
+      font-size: 0.92rem;
+    }
 
-        .back-btn:hover {
-            color: var(--text-color);
-        }
-    </style>
+    .privacy-content strong {
+      color: var(--text-main);
+    }
+
+    .privacy-content ul {
+      margin-left: 20px;
+      margin-bottom: 18px;
+      color: var(--text-muted);
+    }
+
+    .privacy-content li {
+      margin-bottom: 6px;
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    .privacy-content a {
+      color: var(--amber-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .privacy-content a:hover {
+      color: var(--orange-accent);
+    }
+
+    .privacy-bottom-action {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+      .privacy-wrapper {
+        padding: 80px 0 40px;
+      }
+      .privacy-card {
+        padding: 24px 18px;
+      }
+      .privacy-header h1 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="tech-grid-pattern"></div>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="navbar-wrapper">
+    <nav class="navbar" aria-label="Main Navigation">
+      <div class="navbar-inner">
+        <a href="index.html" class="nav-brand">
+          <div class="brand-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+              <circle cx="8.5" cy="16" r="1.5"></circle>
+              <circle cx="15.5" cy="16" r="1.5"></circle>
+              <path d="M12 2v4"></path>
+              <path d="M8 7h8"></path>
+              <path d="M2 14h1"></path>
+              <path d="M21 14h1"></path>
+            </svg>
+          </div>
+          <div class="brand-name">
+            <span data-tr="Aslan Bot" data-en="Aslan Bot">Aslan Bot</span>
+          </div>
+        </a>
 
-    <div class="privacy-container">
-        <!-- Ana Sayfaya Geri Dön Butonu -->
-        <a href="index.html" class="back-btn">← Ana Sayfaya Dön</a>
 
-        <h1>Aslan Bot Gizlilik Politikası</h1>
-        <div class="date">Son Güncelleme Tarihi: 26 Haziran 2026</div>
-        <hr>
+        <div class="nav-links">
+          <a href="index.html#home" class="nav-link" data-tr="Ana Sayfa" data-en="Home">Ana Sayfa</a>
+          <a href="index.html#bot-durumu" class="nav-link" data-tr="Bot Durumu" data-en="Bot Status">Bot Durumu</a>
+          <a href="index.html#faq" class="nav-link" data-tr="SSS" data-en="FAQ">SSS</a>
+          <a href="index.html#iletisim" class="nav-link" data-tr="İletişim" data-en="Contact">İletişim</a>
+        </div>
 
-        <p>Bu gizlilik politikası, <strong>Aslan Bot</strong>'un ("Bot") Discord platformu üzerinde nasıl çalıştığını,
-            hangi verileri topladığını, bu verilerin nasıl kullanıldığını ve korunduğunu açıklamaktadır. Aslan Bot'u
-            sunucunuza ekleyerek veya kullanarak bu gizlilik politikasında belirtilen şartları kabul etmiş olursunuz.
-        </p>
+        <div class="nav-controls">
 
-        <h2>1. Veri Toplama ve Kullanım</h2>
-        <p>Aslan Bot, hizmet kalitesini artırmak, sistemdeki olası hataları (bug) tespit etmek ve kullanıcı deneyimini
-            iyileştirmek amacıyla yalnızca minimum düzeyde ve işlevsellik için zorunlu olan verileri toplar.</p>
+          <button class="control-btn" id="langToggle" aria-label="Dili Değiştir / Switch Language">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span class="lang-text">EN</span>
+          </button>
+          
 
-        <p><strong>Toplanan Veriler:</strong><br>Botu kullandığınızda yalnızca aşağıdaki veriler kayıt altına alınır:
-        </p>
-        <ul>
-            <li>Kullanıcı Adı ve Kullanıcı ID'si</li>
-            <li>Kullanılan Komut</li>
-            <li>Botun Verdiği Cevaplar</li>
-        </ul>
-        <p>Bu veriler dışında hiçbir kişisel bilginiz (Ad-Soyadı, Telefon Numarası, E-posta adresi, Hesap Tokenı, Hesap
-            Şifresi vb.) <strong>kesinlikle toplanmaz veya kullanılmaz.</strong></p>
+          <button class="control-btn" id="themeToggle" aria-label="Temayı Değiştir / Toggle Theme">
+            <span class="theme-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="m4.93 4.93 1.41 1.41"></path>
+                <path d="m17.66 17.66 1.41 1.41"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="m6.34 17.66-1.41 1.41"></path>
+                <path d="m19.07 4.93-1.41 1.41"></path>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </nav>
+  </div>
 
-        <p><strong>Kullanım Amacı:</strong><br>Toplanan bu veriler sadece analiz ve hata ayıklama (debugging) amacıyla
-            kullanılır. Kullanıcıların kişisel profillerini oluşturmak veya izinsiz bir takip sağlamak gibi amaçlar
-            kesinlikle güdülmez.</p>
+  <main class="privacy-wrapper">
+    <div class="container">
+      <div class="glass-card privacy-card">
+        <a href="index.html" class="back-nav-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span data-tr="Ana Sayfaya Dön" data-en="Back to Home">Ana Sayfaya Dön</span>
+        </a>
 
-        <p><strong>Veri Saklama Süresi:</strong><br>Gizliliğinize duyduğumuz saygı gereği, toplanan tüm veriler
-            sistemlerimizde yalnızca <strong>2 hafta (14 gün)</strong> süreyle tutulur. Bu süre dolduğunda tüm kayıtlar
-            veritabanımızdan kalıcı ve geri döndürülemez bir şekilde tamamen yok edilir.</p>
+        <div class="privacy-header">
+          <h1 class="gradient-text" data-tr="Gizlilik Politikası" data-en="Privacy Policy">Gizlilik Politikası</h1>
+          <div class="privacy-meta">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span data-tr="Son Güncelleme: 26 Haziran 2026" data-en="Last Updated: June 26, 2026">Son Güncelleme: 26 Haziran 2026</span>
+          </div>
+        </div>
 
-        <h2>2. Üçüncü Taraflar ile Veri Paylaşımı</h2>
-        <p>Aslan Bot, kullanıcılarının verilerinin gizliliğini temel bir hak olarak görür. Bu doğrultuda, toplanan
-            verilerin durumu şöyledir:</p>
-        <ul>
-            <li>Toplanan hiçbir veri kesinlikle satılmaz, kiralanmaz veya ticari bir amaçla kullanılmaz.</li>
-            <li>Kullanıcı verileri; analitik şirketleri, reklamverenler veya diğer bot geliştiricileri dahil olmak üzere
-                hiçbir üçüncü taraf ile paylaşılmaz.</li>
-        </ul>
+        <div class="privacy-content">
+          <p data-tr="Bu gizlilik politikası, Aslan Bot'un ('Bot') Discord platformu üzerinde nasıl çalıştığını, hangi verileri topladığını, bu verilerin nasıl kullanıldığını ve korunduğunu açıklamaktadır. Aslan Bot'u sunucunuza ekleyerek veya kullanarak bu gizlilik politikasında belirtilen şartları kabul etmiş olursunuz."
+             data-en="This privacy policy explains how Aslan Bot ('Bot') operates on the Discord platform, what data it collects, and how this data is utilized and protected. By inviting or using Aslan Bot on your server, you agree to the terms specified in this privacy policy.">
+            Bu gizlilik politikası, <strong>Aslan Bot</strong>'un ("Bot") Discord platformu üzerinde nasıl çalıştığını, hangi verileri topladığını, bu verilerin nasıl kullanıldığını ve korunduğunu açıklamaktadır. Aslan Bot'u sunucunuza ekleyerek veya kullanarak bu gizlilik politikasında belirtilen şartları kabul etmiş olursunuz.
+          </p>
 
-        <h2>3. Kullanıcı Güvenliği ve İzinler</h2>
-        <p>Bot, kullanıcı gizliliğini ve veri güvenliğini en üst düzeyde sağlayacak modern güvenlik standartlarıyla
-            donatılmıştır.</p>
-        <ul>
-            <li><strong>İzin Tabanlı Çalışma:</strong> Aslan Bot, yalnızca sunucu yöneticileri veya kullanıcılar
-                tarafından kendisine açıkça verilen izinler doğrultusunda çalışır. Botun yetkileri dışında bir işlem
-                yapması mümkün değildir.</li>
-            <li><strong>Uzaktan Müdahale Yoktur:</strong> Botun işleyişine veya sunucunuzdaki faaliyetlerine hiçbir
-                şekilde uzaktan gizli bir müdahale veya erişim gerçekleştirilemez. Sistem tamamen şeffaf komut-tepki
-                mantığıyla işler.</li>
-            <li><strong>Platform Standartlarına Uyum:</strong> Aslan Bot, Discord'un Hizmet Şartları'na (Terms of
-                Service) ve Geliştirici Gizlilik Politikaları'na tam uyum sağlar.</li>
-        </ul>
+          <h2 data-tr="1. Veri Toplama ve Kullanım" data-en="1. Data Collection and Usage">1. Veri Toplama ve Kullanım</h2>
+          <p data-tr="Aslan Bot, hizmet kalitesini artırmak, sistemdeki olası hataları (bug) tespit etmek ve kullanıcı deneyimini iyileştirmek amacıyla yalnızca minimum düzeyde ve işlevsellik için zorunlu olan verileri toplar."
+             data-en="Aslan Bot collects only the minimum necessary data required for functionality, service quality improvements, bug detection, and user experience enhancement.">
+            Aslan Bot, hizmet kalitesini artırmak, sistemdeki olası hataları (bug) tespit etmek ve kullanıcı deneyimini iyileştirmek amacıyla yalnızca minimum düzeyde ve işlevsellik için zorunlu olan verileri toplar.
+          </p>
 
-        <h2>4. Kullanıcı Hakları ve Veri Silme Talebi</h2>
-        <p>Aslan Bot, kullanıcılarına verileri üzerinde tam kontrol hakkı tanır. Verileriniz 2 haftalık sürenin sonunda
-            sistemlerimizden otomatik olarak tamamen temizlenmektedir. Ancak bu süreyi beklemek istemiyorsanız:</p>
-        <ul>
-            <li>Dilediğiniz an bizimle iletişime geçerek botun veritabanında bulunan size ait verilerin (Kullanıcı adı,
-                ID, komut geçmişi) dökümünü talep edebilir veya sistemlerimizden <strong>kalıcı olarak
-                    silinmesini</strong> isteyebilirsiniz.</li>
-            <li>Talebiniz bize ulaştıktan sonra gerekli incelemeler yapılarak verileriniz derhal yok edilir veya
-                tarafınıza iletilir.</li>
-        </ul>
+          <p>
+            <strong data-tr="Toplanan Veriler:" data-en="Collected Data:">Toplanan Veriler:</strong><br>
+            <span data-tr="Botu kullandığınızda yalnızca aşağıdaki veriler kayıt altına alınır:" data-en="When using the bot, only the following data is logged:">Botu kullandığınızda yalnızca aşağıdaki veriler kayıt altına alınır:</span>
+          </p>
+          <ul>
+            <li data-tr="Kullanıcı Adı ve Kullanıcı ID'si" data-en="Username and User ID">Kullanıcı Adı ve Kullanıcı ID'si</li>
+            <li data-tr="Kullanılan Komut" data-en="Command Executed">Kullanılan Komut</li>
+            <li data-tr="Botun Verdiği Cevaplar" data-en="Bot Responses">Botun Verdiği Cevaplar</li>
+          </ul>
+          <p data-tr="Bu veriler dışında hiçbir kişisel bilginiz (Ad-Soyadı, Telefon Numarası, E-posta adresi, Hesap Tokenı, Hesap Şifresi vb.) kesinlikle toplanmaz veya kullanılmaz."
+             data-en="Apart from these, no personal information (Full Name, Phone Number, Email, Account Token, Passwords, etc.) is ever collected or used.">
+            Bu veriler dışında hiçbir kişisel bilginiz (Ad-Soyadı, Telefon Numarası, E-posta adresi, Hesap Tokenı, Hesap Şifresi vb.) <strong>kesinlikle toplanmaz veya kullanılmaz.</strong>
+          </p>
 
-        <h2>5. Değişiklikler ve Güncellemeler</h2>
-        <p>Aslan Bot'un özellikleri geliştikçe veya Discord'un politikaları güncellendikçe bu gizlilik politikasında
-            değişiklikler yapılabilir. Önemli değişiklikler yapılması durumunda kullanıcılar destek sunucumuz üzerinden
-            bilgilendirilecektir.</p>
+          <p>
+            <strong data-tr="Kullanım Amacı:" data-en="Purpose of Usage:">Kullanım Amacı:</strong><br>
+            <span data-tr="Toplanan bu veriler sadece analiz ve hata ayıklama (debugging) amacıyla kullanılır. Kullanıcıların kişisel profillerini oluşturmak veya izinsiz bir takip sağlamak gibi amaçlar kesinlikle güdülmez."
+                  data-en="Collected data is strictly used for analysis and debugging. Building personal user profiles or unauthorized tracking is strictly prohibited.">
+              Toplanan bu veriler sadece analiz ve hata ayıklama (debugging) amacıyla kullanılır. Kullanıcıların kişisel profillerini oluşturmak veya izinsiz bir takip sağlamak gibi amaçlar kesinlikle güdülmez.
+            </span>
+          </p>
 
-        <h2>6. İletişim</h2>
-        <p>Gizlilik politikamız, verilerinizin kullanımı, veri silme talepleriniz veya Aslan Bot ile ilgili herhangi bir
-            sorunuz varsa bizimle iletişime geçmekten çekinmeyin:</p>
-        <ul>
-            <li><strong>Discord Destek Sunucumuz:</strong> <a href="https://discord.gg/d6RGBkFUj3"
-                    target="_blank">Buraya Tıklayarak Katılın</a></li>
-            <li><strong>E-posta Adresimiz:</strong> <a href="mailto:aslanoyun36@gmail.com">aslanoyun36@gmail.com</a>
-            </li>
-        </ul>
+          <p>
+            <strong data-tr="Veri Saklama Süresi:" data-en="Data Retention Period:">Veri Saklama Süresi:</strong><br>
+            <span data-tr="Gizliliğinize duyduğumuz saygı gereği, toplanan tüm veriler sistemlerimizde yalnızca 2 hafta (14 gün) süreyle tutulur. Bu süre dolduğunda tüm kayıtlar veritabanımızdan kalıcı ve geri döndürülemez bir şekilde tamamen yok edilir."
+                  data-en="Out of respect for your privacy, all collected data is retained for only 2 weeks (14 days). Once this period expires, all logs are permanently and irreversibly destroyed from our databases.">
+              Gizliliğinize duyduğumuz saygı gereği, toplanan tüm veriler sistemlerimizde yalnızca <strong>2 hafta (14 gün)</strong> süreyle tutulur. Bu süre dolduğunda tüm kayıtlar veritabanımızdan kalıcı ve geri döndürülemez bir şekilde tamamen yok edilir.
+            </span>
+          </p>
+
+          <h2 data-tr="2. Üçüncü Taraflar ile Veri Paylaşımı" data-en="2. Third-Party Data Sharing">2. Üçüncü Taraflar ile Veri Paylaşımı</h2>
+          <p data-tr="Aslan Bot, kullanıcılarının verilerinin gizliliğini temel bir hak olarak görür. Bu doğrultuda, toplanan verilerin durumu şöyledir:"
+             data-en="Aslan Bot considers user data privacy as a fundamental right. Accordingly:">
+            Aslan Bot, kullanıcılarının verilerinin gizliliğini temel bir hak olarak görür. Bu doğrultuda, toplanan verilerin durumu şöyledir:
+          </p>
+          <ul>
+            <li data-tr="Toplanan hiçbir veri kesinlikle satılmaz, kiralanmaz veya ticari bir amaçla kullanılmaz." data-en="No collected data is ever sold, rented, or used for commercial purposes.">Toplanan hiçbir veri kesinlikle satılmaz, kiralanmaz veya ticari bir amaçla kullanılmaz.</li>
+            <li data-tr="Kullanıcı verileri; analitik şirketleri, reklamverenler veya diğer bot geliştiricileri dahil olmak üzere hiçbir üçüncü taraf ile paylaşılmaz." data-en="User data is not shared with any third party, including analytics firms, advertisers, or other developers.">Kullanıcı verileri; analitik şirketleri, reklamverenler veya diğer bot geliştiricileri dahil olmak üzere hiçbir üçüncü taraf ile paylaşılmaz.</li>
+          </ul>
+
+          <h2 data-tr="3. Kullanıcı Güvenliği ve İzinler" data-en="3. User Security and Permissions">3. Kullanıcı Güvenliği ve İzinler</h2>
+          <p data-tr="Bot, kullanıcı gizliliğini ve veri güvenliğini en üst düzeyde sağlayacak modern güvenlik standartlarıyla donatılmıştır."
+             data-en="The bot is built with modern security standards to ensure the highest level of user privacy and data security.">
+            Bot, kullanıcı gizliliğini ve veri güvenliğini en üst düzeyde sağlayacak modern güvenlik standartlarıyla donatılmıştır.
+          </p>
+          <ul>
+            <li data-tr="İzin Tabanlı Çalışma: Aslan Bot, yalnızca sunucu yöneticileri veya kullanıcılar tarafından kendisine açıkça verilen izinler doğrultusunda çalışır." data-en="Permission-Based Operation: Aslan Bot operates solely within the permissions explicitly granted by server administrators or users."><strong>İzin Tabanlı Çalışma:</strong> Aslan Bot, yalnızca sunucu yöneticileri veya kullanıcılar tarafından kendisine açıkça verilen izinler doğrultusunda çalışır.</li>
+            <li data-tr="Platform Standartlarına Uyum: Aslan Bot, Discord'un Hizmet Şartları'na (Terms of Service) ve Geliştirici Gizlilik Politikaları'na tam uyum sağlar." data-en="Platform Compliance: Aslan Bot fully adheres to Discord's Terms of Service and Developer Privacy Policies."><strong>Platform Standartlarına Uyum:</strong> Aslan Bot, Discord'un Hizmet Şartları'na (Terms of Service) ve Geliştirici Gizlilik Politikaları'na tam uyum sağlar.</li>
+          </ul>
+
+          <h2 data-tr="4. İletişim & Destek" data-en="4. Contact & Support">4. İletişim & Destek</h2>
+          <p data-tr="Gizlilik politikamız, verilerinizin kullanımı veya veri silme talepleriniz için bizimle iletişime geçebilirsiniz:"
+             data-en="For questions regarding our privacy policy, data usage, or deletion requests, please contact us:">
+            Gizlilik politikamız, verilerinizin kullanımı veya veri silme talepleriniz için bizimle iletişime geçebilirsiniz:
+          </p>
+          <ul>
+            <li><strong>Discord:</strong> <a href="https://discord.gg/d6RGBkFUj3" target="_blank" rel="noopener noreferrer">https://discord.gg/d6RGBkFUj3</a></li>
+            <li><strong>E-posta:</strong> <a href="mailto:aslanoyun36@gmail.com">aslanoyun36@gmail.com</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
+  </main>
 
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <p data-tr="© 2026 Aslan Oyun. Tüm hakları saklıdır." data-en="© 2026 Aslan Oyun. All rights reserved.">
+          © 2026 Aslan Oyun. Tüm hakları saklıdır.
+        </p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html" class="footer-link" data-tr="Ana Sayfa" data-en="Home">Ana Sayfa</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const html = document.documentElement;
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.querySelector(".theme-icon");
+    const langToggle = document.getElementById("langToggle");
+    const langText = document.querySelector(".lang-text");
+
+    function getSafeStorage(key, defaultValue) {
+      try {
+        const val = localStorage.getItem(key);
+        return val || defaultValue;
+      } catch (e) {
+        return defaultValue;
+      }
+    }
+
+
+    let currentTheme = getSafeStorage("theme", "dark");
+    html.setAttribute("data-theme", currentTheme);
+    renderThemeIcon(currentTheme);
+
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        currentTheme = currentTheme === "dark" ? "light" : "dark";
+        html.setAttribute("data-theme", currentTheme);
+        try { localStorage.setItem("theme", currentTheme); } catch (e) {}
+        renderThemeIcon(currentTheme);
+      });
+    }
+
+    function renderThemeIcon(theme) {
+      if (!themeIcon) return;
+      if (theme === "dark") {
+        themeIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>`;
+      } else {
+        themeIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>`;
+      }
+    }
+
+
+    let currentLang = getSafeStorage("language", "tr");
+    updateLanguage(currentLang);
+
+    if (langToggle) {
+      langToggle.addEventListener("click", () => {
+        currentLang = currentLang === "tr" ? "en" : "tr";
+        try { localStorage.setItem("language", currentLang); } catch (e) {}
+        updateLanguage(currentLang);
+      });
+    }
+
+    function updateLanguage(lang) {
+      const elements = document.querySelectorAll("[data-tr][data-en]");
+      elements.forEach((el) => {
+        const text = el.getAttribute(`data-${lang}`);
+        if (text) el.textContent = text;
+      });
+      if (langText) langText.textContent = lang === "tr" ? "EN" : "TR";
+    }
+  </script>
 </body>
 
 </html>

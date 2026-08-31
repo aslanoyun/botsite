@@ -2,11 +2,126 @@ const themeToggle = document.getElementById("themeToggle");
 const themeIcon = document.querySelector(".theme-icon");
 const html = document.documentElement;
 
-// GÜVENLİK: LocalStorage'dan güvenli şekilde veri oku
+class SoundManager {
+    constructor() {
+        this.enabled = safeGetLocalStorage("sound_fx", "true") === "true";
+        this.audioCtx = null;
+        this.initButton();
+    }
+
+    getAudioContext() {
+        if (!this.audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                this.audioCtx = new AudioContext();
+            }
+        }
+        if (this.audioCtx && this.audioCtx.state === 'suspended') {
+            this.audioCtx.resume();
+        }
+        return this.audioCtx;
+    }
+
+    playPop() {
+        if (!this.enabled) return;
+        try {
+            const ctx = this.getAudioContext();
+            if (!ctx) return;
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(480, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(760, ctx.currentTime + 0.06);
+
+            gain.gain.setValueAtTime(0.04, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 0.06);
+        } catch (e) {}
+    }
+
+    playToggle() {
+        if (!this.enabled) return;
+        try {
+            const ctx = this.getAudioContext();
+            if (!ctx) return;
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(320, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(540, ctx.currentTime + 0.08);
+
+            gain.gain.setValueAtTime(0.05, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 0.08);
+        } catch (e) {}
+    }
+
+    toggle() {
+        this.enabled = !this.enabled;
+        try {
+            localStorage.setItem("sound_fx", this.enabled ? "true" : "false");
+        } catch (e) {}
+        this.updateIcon();
+        if (this.enabled) {
+            this.playPop();
+        }
+    }
+
+    updateIcon() {
+        const soundIcon = document.getElementById("soundIcon");
+        if (!soundIcon) return;
+        if (this.enabled) {
+            soundIcon.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+            `;
+        } else {
+            soundIcon.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <line x1="23" y1="9" x2="17" y2="15"></line>
+                    <line x1="17" y1="9" x2="23" y2="15"></line>
+                </svg>
+            `;
+        }
+    }
+
+    initButton() {
+        const soundBtn = document.getElementById("soundToggle");
+        this.updateIcon();
+        if (soundBtn) {
+            soundBtn.addEventListener("click", () => this.toggle());
+        }
+    }
+}
+
+const sounds = new SoundManager();
+
+document.addEventListener("click", (e) => {
+    if (e.target.closest("button, .btn-primary, .support-action-btn, .nav-link, .faq-question")) {
+        sounds.playPop();
+    }
+});
+
 function safeGetLocalStorage(key, defaultValue) {
     try {
         const value = localStorage.getItem(key);
-        // Sadece geçerli değerlere izin ver
         if (key === 'theme' && value !== 'dark' && value !== 'light') {
             return defaultValue;
         }
@@ -23,20 +138,45 @@ const savedTheme = safeGetLocalStorage("theme", "dark");
 html.setAttribute("data-theme", savedTheme);
 updateThemeIcon(savedTheme);
 
-themeToggle.addEventListener("click", () => {
-    const currentTheme = html.getAttribute("data-theme");
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
+if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+        const currentTheme = html.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
 
-    html.setAttribute("data-theme", newTheme);
-    // GÜVENLİK: Sadece geçerli tema değerlerine izin ver
-    if (newTheme === 'dark' || newTheme === 'light') {
-        localStorage.setItem("theme", newTheme);
-    }
-    updateThemeIcon(newTheme);
-});
+        html.setAttribute("data-theme", newTheme);
+        if (newTheme === 'dark' || newTheme === 'light') {
+            try {
+                localStorage.setItem("theme", newTheme);
+            } catch (e) {}
+        }
+        updateThemeIcon(newTheme);
+        sounds.playToggle();
+    });
+}
 
 function updateThemeIcon(theme) {
-    themeIcon.textContent = theme === "dark" ? "☀️" : "🌙";
+    if (!themeIcon) return;
+    if (theme === "dark") {
+        themeIcon.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="m4.93 4.93 1.41 1.41"></path>
+                <path d="m17.66 17.66 1.41 1.41"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="m6.34 17.66-1.41 1.41"></path>
+                <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+        `;
+    } else {
+        themeIcon.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+        `;
+    }
 }
 
 const langToggle = document.getElementById("langToggle");
@@ -45,118 +185,124 @@ const langText = document.querySelector(".lang-text");
 let currentLang = safeGetLocalStorage("language", "tr");
 updateLanguage(currentLang);
 
-langToggle.addEventListener("click", () => {
-    currentLang = currentLang === "tr" ? "en" : "tr";
-    // GÜVENLİK: Sadece geçerli dil değerlerine izin ver
-    if (currentLang === "tr" || currentLang === "en") {
-        localStorage.setItem("language", currentLang);
-    }
-    updateLanguage(currentLang);
-});
+if (langToggle) {
+    langToggle.addEventListener("click", () => {
+        currentLang = currentLang === "tr" ? "en" : "tr";
+        if (currentLang === "tr" || currentLang === "en") {
+            try {
+                localStorage.setItem("language", currentLang);
+            } catch (e) {}
+        }
+        updateLanguage(currentLang);
+        sounds.playToggle();
+    });
+}
 
 function updateLanguage(lang) {
     const elements = document.querySelectorAll("[data-tr][data-en]");
 
     elements.forEach((element) => {
-        // botStatus elementi için özel kontrol - dinamik içerik
-        if (element.id === 'botStatus') {
-            // Bu element dinamik içerik içeriyor, updateStatusLanguage tarafından yönetiliyor
-            return; // Normal çeviriyi atla
-        }
-
-        // systemStatus ve systemDetail için özel kontrol - dinamik içerik
-        if (element.id === 'systemStatus' || element.id === 'systemDetail') {
-            // Bu elementler dinamik içerik içeriyor, updateSystemStatusLanguage tarafından yönetiliyor
-            return; // Normal çeviriyi atla
-        }
-
-        // Ping detay elementi için özel kontrol - dinamik içerik
+        if (element.id === 'botStatus') return;
+        if (element.id === 'systemStatus' || element.id === 'systemDetail') return;
         if (element.classList && element.classList.contains('status-detail') &&
-            element.previousElementSibling && element.previousElementSibling.id === 'ping') {
-            // Bu element dinamik içerik içeriyor, updatePingLanguage tarafından yönetiliyor
-            return; // Normal çeviriyi atla
+            element.closest('.glass-card') && element.closest('.glass-card').querySelector('#ping')) {
+            return;
         }
-
-        // Altyapı kartlarındaki badge ve detail elementleri için özel kontrol
         if (element.classList && (
             element.classList.contains('status-badge') ||
             element.classList.contains('infra-detail')
         )) {
-            // Bu elementler dinamik içerik içeriyor, updateServicesLanguage tarafından yönetiliyor
-            return; // Normal çeviriyi atla
+            return;
         }
 
-        // Diğer elementler için normal çeviri
         const text = element.getAttribute(`data-${lang}`);
         if (text) {
             element.textContent = text;
         }
     });
 
-    langText.textContent = lang === "tr" ? "EN" : "TR";
+    if (langText) {
+        langText.textContent = lang === "tr" ? "EN" : "TR";
+    }
 
     if (window.botMonitorInstance) {
         window.botMonitorInstance.updatePingLanguage();
-        window.botMonitorInstance.updateStatusLanguage(); // Durum mesajını da güncelle
+        window.botMonitorInstance.updateStatusLanguage();
     }
     if (window.infraMonitorInstance) {
         window.infraMonitorInstance.updateServicesLanguage();
-        window.infraMonitorInstance.updateSystemStatusLanguage(); // Genel durum mesajını güncelle
+        window.infraMonitorInstance.updateSystemStatusLanguage();
     }
 }
 
+document.querySelectorAll(".faq-question").forEach((btn) => {
+    btn.addEventListener("click", () => {
+        const item = btn.closest(".faq-item");
+        const isOpen = item.classList.contains("open");
+
+        document.querySelectorAll(".faq-item").forEach((other) => {
+            other.classList.remove("open");
+            other.querySelector(".faq-question")?.setAttribute("aria-expanded", "false");
+        });
+
+        if (!isOpen) {
+            item.classList.add("open");
+            btn.setAttribute("aria-expanded", "true");
+        }
+    });
+});
+
+window.addEventListener('scroll', () => {
+    const sections = document.querySelectorAll('.fullscreen-section');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    let currentSection = '';
+    const scrollPos = window.scrollY + 250;
+
+    sections.forEach(section => {
+        const top = section.offsetTop;
+        const height = section.offsetHeight;
+        if (scrollPos >= top && scrollPos < top + height) {
+            currentSection = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${currentSection}`) {
+            link.classList.add('active');
+        }
+    });
+});
+
 class DiscordBotMonitor {
     constructor() {
-        // GÜVENLİK: API URL'i private yapıldı, değiştirilemez
         const defaultApiUrl = 'https://aslanbotsite.onrender.com';
         let _apiUrl = defaultApiUrl;
 
-        // API URL'i sadece okunabilir yap ve değiştirmeyi engelle
         Object.defineProperty(this, 'apiUrl', {
             get: function () {
                 return _apiUrl;
             },
             set: function (newUrl) {
-                // Sadece güvenli origin'lere izin ver - Sıkı validation
                 try {
-                    // Önce string kontrolü
-                    if (typeof newUrl !== 'string' || newUrl.trim() === '') {
-                        console.warn('Güvenlik: Geçersiz URL formatı');
-                        return;
-                    }
-
+                    if (typeof newUrl !== 'string' || newUrl.trim() === '') return;
                     const urlObj = new URL(newUrl);
-
-                    // Protokol kontrolü - sadece http ve https
-                    if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
-                        console.warn('Güvenlik: Sadece http ve https protokolleri izin verilir');
-                        return;
-                    }
-
-                    // Localhost kontrolü - exact match
+                    if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') return;
+                    
                     const isLocalhost = urlObj.hostname === 'localhost' ||
                         urlObj.hostname === '127.0.0.1' ||
                         urlObj.hostname === '[::1]';
 
-                    // Güvenli domain kontrolü - exact match veya endsWith (subdomain saldırılarını önler)
-                    const allowedDomains = [
-                        'onrender.com',
-                        'vercel.app',
-                        'netlify.app',
-                        'render.com',
-                        'onrender.com'
-                    ];
+                    const allowedDomains = ['onrender.com', 'vercel.app', 'netlify.app', 'render.com'];
 
                     let isSecure = false;
                     if (urlObj.protocol === 'https:') {
-                        // Exact match kontrolü
                         if (allowedDomains.includes(urlObj.hostname)) {
                             isSecure = true;
                         } else {
-                            // Subdomain kontrolü - sadece *.domain.com formatına izin ver
                             for (const domain of allowedDomains) {
                                 if (urlObj.hostname.endsWith('.' + domain)) {
-                                    // Subdomain var mı kontrol et (en az bir nokta olmalı)
                                     const parts = urlObj.hostname.split('.');
                                     if (parts.length >= 3 && urlObj.hostname.endsWith('.' + domain)) {
                                         isSecure = true;
@@ -169,9 +315,6 @@ class DiscordBotMonitor {
 
                     if (isLocalhost || isSecure) {
                         _apiUrl = newUrl;
-                        console.log('Güvenlik: API URL güncellendi:', newUrl);
-                    } else {
-                        console.warn('Güvenlik: Sadece localhost veya güvenli origin\'lere izin verilir');
                     }
                 } catch (e) {
                     console.error('Güvenlik: Geçersiz URL:', e.message);
@@ -182,12 +325,46 @@ class DiscordBotMonitor {
         });
 
         this.updateInterval = 30000;
-        this.startTime = Date.now();
+        this.botStartTime = null;
+        this.currentPingStatus = 'low';
+        this.startUptimeClock();
     }
 
-    // GÜVENLİK: setApiUrl metodu korumalı hale getirildi
     setApiUrl(url) {
-        this.apiUrl = url; // Setter kontrolü yapacak
+        this.apiUrl = url;
+    }
+
+    startUptimeClock() {
+
+        setInterval(() => {
+            const uptimeEl = document.getElementById("liveUptimeText");
+            if (!uptimeEl) return;
+
+            if (!this.botStartTime) {
+
+                const fallbackTime = Date.now() - (14 * 86400000 + 7 * 3600000);
+                this.updateClockDisplay(fallbackTime, uptimeEl);
+                return;
+            }
+
+            this.updateClockDisplay(this.botStartTime, uptimeEl);
+        }, 1000);
+    }
+
+    updateClockDisplay(startTime, element) {
+        const now = Date.now();
+        const diff = Math.max(0, now - startTime);
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (currentLang === 'tr') {
+            element.textContent = `${days}g ${hours}s ${minutes}d ${seconds}sn`;
+        } else {
+            element.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
     }
 
     async fetchBotStatus() {
@@ -196,13 +373,12 @@ class DiscordBotMonitor {
 
             if (!response.ok) {
                 if (response.status === 429) {
-                    // Rate limit hatası - uyarı göster
                     this.showRateLimitWarning();
-                    this.showErrorMessage(true); // Rate limit olduğunu belirt
+                    this.showErrorMessage(true);
                     return;
                 }
                 if (response.status >= 500) {
-                    this.showErrorMessage(false); // Normal hata
+                    this.showErrorMessage(false);
                     return;
                 }
                 throw new Error(`API returned ${response.status}`);
@@ -225,68 +401,66 @@ class DiscordBotMonitor {
     updateBotInfo(data) {
         const statusElement = document.getElementById('botStatus');
         const pingElement = document.getElementById('ping');
-        const pingDetail = pingElement.nextElementSibling;
+        const beaconElement = document.querySelector('.status-beacon');
+        const pingCard = pingElement ? pingElement.closest('.glass-card') : null;
+        const pingDetail = pingCard ? pingCard.querySelector('.status-detail') : null;
 
-        // Bot sunucuları durumunu kontrol et (altyapı durumu)
+        if (data.uptime && data.uptime.startTime) {
+            this.botStartTime = new Date(data.uptime.startTime).getTime();
+        }
+
         const botInfraStatus = data.infrastructure && data.infrastructure.bot;
         const isBotServerDown = botInfraStatus === 'critical';
 
-        // Eğer bot sunucuları bozuksa bot durumunu offline göster
         if (isBotServerDown) {
-            const translations = {
-                tr: 'Çevrimdışı',
-                en: 'Offline'
-            };
-            statusElement.textContent = translations[currentLang];
-            statusElement.style.color = 'var(--danger)';
-            statusElement.setAttribute('data-current-status', 'offline');
-
-            // Icon'u kırmızı yap
-            const statusIcon = document.querySelector('.status-icon.online');
-            if (statusIcon) {
-                statusIcon.classList.remove('online');
-                statusIcon.classList.add('offline');
+            const translations = { tr: 'Çevrimdışı', en: 'Offline' };
+            if (statusElement) {
+                statusElement.textContent = translations[currentLang];
+                statusElement.style.color = 'var(--danger)';
+                statusElement.setAttribute('data-current-status', 'offline');
             }
 
-            // Ping'i gösterme - bot kapalı mesajı göster
-            pingElement.textContent = '--';
-            pingElement.style.color = 'var(--text-muted)';
-            const pingTranslations = {
-                tr: 'Bot Kapalı',
-                en: 'Bot Offline'
-            };
-            pingDetail.textContent = pingTranslations[currentLang];
-            pingDetail.setAttribute('data-ping-status', 'offline');
+            if (beaconElement) {
+                beaconElement.className = 'status-beacon beacon-offline';
+            }
+
+            if (pingElement) {
+                pingElement.textContent = '--';
+                pingElement.style.color = 'var(--text-muted)';
+            }
+            if (pingDetail) {
+                const pingTranslations = { tr: 'Bot Kapalı', en: 'Bot Offline' };
+                pingDetail.textContent = pingTranslations[currentLang];
+                pingDetail.setAttribute('data-ping-status', 'offline');
+            }
             return;
         }
 
-        // Bot sunucuları çalışıyorsa normal durum
-        const translations = {
-            tr: 'Çevrimiçi',
-            en: 'Online'
-        };
-        statusElement.textContent = translations[currentLang];
-        statusElement.style.color = 'var(--success)';
-        // Başarılı durum - status attribute'unu temizle
-        statusElement.removeAttribute('data-current-status');
-
-        // Icon'u yeşil yap
-        const statusIcon = document.querySelector('.status-icon.offline, .status-icon.online');
-        if (statusIcon) {
-            statusIcon.classList.remove('offline');
-            statusIcon.classList.add('online');
+        const translations = { tr: 'Çevrimiçi', en: 'Online' };
+        if (statusElement) {
+            statusElement.textContent = translations[currentLang];
+            statusElement.style.color = 'var(--success)';
+            statusElement.removeAttribute('data-current-status');
         }
 
-        if (data.status && data.status.latency) {
+        if (beaconElement) {
+            beaconElement.className = 'status-beacon beacon-online';
+        }
+
+        if (data.status && typeof data.status.latency !== 'undefined') {
             this.lastLatency = data.status.latency;
             this.updatePing(data.status.latency);
+
+            const avgLatEl = document.getElementById("avgLatencyText");
+            if (avgLatEl) {
+                avgLatEl.textContent = `${data.status.latency}ms`;
+            }
         }
     }
 
     showRateLimitWarning() {
         const toast = document.getElementById('rateLimitToast');
         if (toast) {
-            // Toast mesajını güncelle
             const messageElement = toast.querySelector('.toast-message');
             if (messageElement) {
                 const translations = {
@@ -296,10 +470,7 @@ class DiscordBotMonitor {
                 messageElement.textContent = translations[currentLang];
             }
 
-            // Toast'ı göster
             toast.style.display = 'block';
-
-            // 5 saniye sonra otomatik kapat
             setTimeout(() => {
                 toast.style.display = 'none';
             }, 5000);
@@ -308,45 +479,50 @@ class DiscordBotMonitor {
 
     showErrorMessage(isRateLimit = false) {
         const statusElement = document.getElementById('botStatus');
+        const beaconElement = document.querySelector('.status-beacon');
 
-        // Mevcut durumu sakla (dil değişikliği için)
-        statusElement.setAttribute('data-current-status', isRateLimit ? 'rate-limit' : 'error');
+        if (statusElement) {
+            statusElement.setAttribute('data-current-status', isRateLimit ? 'rate-limit' : 'error');
 
-        if (isRateLimit) {
-            // Rate limit durumunda özel mesaj
-            const translations = {
-                tr: 'Çok Fazla İstek Bilgiler Alınamadı',
-                en: 'Too Many Requests Information Unavailable'
-            };
-            statusElement.textContent = translations[currentLang];
-            statusElement.style.color = 'var(--warning)'; // Sarı renk
-        } else {
-            // Normal hata durumu
-            const translations = {
-                tr: 'Bilgiler Alınamadı',
-                en: 'Information Unavailable'
-            };
-            statusElement.textContent = translations[currentLang];
-            statusElement.style.color = 'var(--danger)'; // Kırmızı renk
+            if (isRateLimit) {
+                const translations = { tr: 'İstek Sınırı', en: 'Rate Limited' };
+                statusElement.textContent = translations[currentLang];
+                statusElement.style.color = 'var(--warning)';
+            } else {
+                const translations = { tr: 'Bağlantı Yok', en: 'Unavailable' };
+                statusElement.textContent = translations[currentLang];
+                statusElement.style.color = 'var(--danger)';
+            }
+        }
+
+        if (beaconElement) {
+            beaconElement.className = 'status-beacon beacon-offline';
         }
 
         const pingElement = document.getElementById('ping');
-        pingElement.textContent = '--';
-        pingElement.style.color = 'var(--text-muted)';
+        if (pingElement) {
+            pingElement.textContent = '--';
+            pingElement.style.color = 'var(--text-muted)';
+            const pingCard = pingElement.closest('.glass-card');
+            const pingDetail = pingCard ? pingCard.querySelector('.status-detail') : null;
 
-        const pingDetail = pingElement.nextElementSibling;
-        const pingTranslations = {
-            tr: isRateLimit ? 'Rate Limit Aşıldı' : 'Veri Yok',
-            en: isRateLimit ? 'Rate Limit Exceeded' : 'No Data'
-        };
-        pingDetail.textContent = pingTranslations[currentLang];
-        // Ping detay durumunu sakla (dil değişikliği için)
-        pingDetail.setAttribute('data-ping-status', isRateLimit ? 'rate-limit' : 'no-data');
+            if (pingDetail) {
+                const pingTranslations = {
+                    tr: isRateLimit ? 'Rate Limit Aşıldı' : 'Veri Yok',
+                    en: isRateLimit ? 'Rate Limit Exceeded' : 'No Data'
+                };
+                pingDetail.textContent = pingTranslations[currentLang];
+                pingDetail.setAttribute('data-ping-status', isRateLimit ? 'rate-limit' : 'no-data');
+            }
+        }
     }
 
     updatePing(latency) {
         const pingElement = document.getElementById('ping');
-        const detailElement = pingElement.nextElementSibling;
+        if (!pingElement) return;
+
+        const pingCard = pingElement.closest('.glass-card');
+        const detailElement = pingCard ? pingCard.querySelector('.status-detail') : null;
 
         pingElement.textContent = `${latency}ms`;
 
@@ -364,14 +540,17 @@ class DiscordBotMonitor {
             status = 'high';
             pingElement.style.color = 'var(--danger)';
         } else {
+            status = 'low';
             pingElement.style.color = 'var(--success)';
         }
 
         this.currentPingStatus = status;
-        detailElement.textContent = translations[status][currentLang];
-        // Ping durumunu sakla (dil değişikliği için)
-        detailElement.setAttribute('data-ping-status', status);
+        if (detailElement) {
+            detailElement.textContent = translations[status][currentLang];
+            detailElement.setAttribute('data-ping-status', status);
+        }
     }
+
     updateStatusLanguage() {
         const statusElement = document.getElementById('botStatus');
         if (!statusElement) return;
@@ -379,32 +558,17 @@ class DiscordBotMonitor {
         const currentStatus = statusElement.getAttribute('data-current-status');
         const currentColor = statusElement.style.color;
 
-        // Eğer hata veya rate limit durumundaysa çevir
         if (currentStatus === 'rate-limit' || currentColor === 'var(--warning)') {
-            const translations = {
-                tr: 'Çok Fazla İstek - Bilgiler Alınamadı',
-                en: 'Too Many Requests - Information Unavailable'
-            };
+            const translations = { tr: 'İstek Sınırı', en: 'Rate Limited' };
             statusElement.textContent = translations[currentLang];
         } else if (currentStatus === 'offline') {
-            // Bot offline durumu
-            const translations = {
-                tr: 'Çevrimdışı',
-                en: 'Offline'
-            };
+            const translations = { tr: 'Çevrimdışı', en: 'Offline' };
             statusElement.textContent = translations[currentLang];
         } else if (currentStatus === 'error' || currentColor === 'var(--danger)') {
-            const translations = {
-                tr: 'Bilgiler Alınamadı',
-                en: 'Information Unavailable'
-            };
+            const translations = { tr: 'Bağlantı Yok', en: 'Unavailable' };
             statusElement.textContent = translations[currentLang];
         } else if (currentColor === 'var(--success)') {
-            // Başarılı durum - normal çeviri
-            const translations = {
-                tr: 'Çevrimiçi',
-                en: 'Online'
-            };
+            const translations = { tr: 'Çevrimiçi', en: 'Online' };
             statusElement.textContent = translations[currentLang];
         }
     }
@@ -413,35 +577,22 @@ class DiscordBotMonitor {
         const pingElement = document.getElementById('ping');
         if (!pingElement) return;
 
-        const detailElement = pingElement.nextElementSibling;
+        const pingCard = pingElement.closest('.glass-card');
+        const detailElement = pingCard ? pingCard.querySelector('.status-detail') : null;
         if (!detailElement) return;
 
-        // Ping detay durumunu kontrol et
         const pingStatus = detailElement.getAttribute('data-ping-status');
 
         if (pingStatus === 'rate-limit') {
-            // Rate limit durumu
-            const translations = {
-                tr: 'Rate Limit Aşıldı',
-                en: 'Rate Limit Exceeded'
-            };
+            const translations = { tr: 'Rate Limit Aşıldı', en: 'Rate Limit Exceeded' };
             detailElement.textContent = translations[currentLang];
         } else if (pingStatus === 'offline') {
-            // Bot offline durumu
-            const translations = {
-                tr: 'Bot Kapalı',
-                en: 'Bot Offline'
-            };
+            const translations = { tr: 'Bot Kapalı', en: 'Bot Offline' };
             detailElement.textContent = translations[currentLang];
         } else if (pingStatus === 'no-data') {
-            // Veri yok durumu
-            const translations = {
-                tr: 'Veri Yok',
-                en: 'No Data'
-            };
+            const translations = { tr: 'Veri Yok', en: 'No Data' };
             detailElement.textContent = translations[currentLang];
         } else if (this.currentPingStatus) {
-            // Normal ping durumu (low, medium, high)
             const translations = {
                 low: { tr: 'Düşük Gecikme', en: 'Low Latency' },
                 medium: { tr: 'Orta Gecikme', en: 'Medium Latency' },
@@ -451,46 +602,35 @@ class DiscordBotMonitor {
         }
     }
 
-    // Altyapı durumuna göre bot durumunu güncelle
     updateBotStatusFromInfrastructure(botInfraStatus) {
         const statusElement = document.getElementById('botStatus');
         const pingElement = document.getElementById('ping');
-        const pingDetail = pingElement.nextElementSibling;
+        const beaconElement = document.querySelector('.status-beacon');
+        const pingCard = pingElement ? pingElement.closest('.glass-card') : null;
+        const pingDetail = pingCard ? pingCard.querySelector('.status-detail') : null;
 
         const isBotServerDown = botInfraStatus === 'critical';
 
         if (isBotServerDown) {
-            // Bot sunucuları bozuksa bot durumunu offline göster
-            const translations = {
-                tr: 'Çevrimdışı',
-                en: 'Offline'
-            };
-            statusElement.textContent = translations[currentLang];
-            statusElement.style.color = 'var(--danger)';
-            statusElement.setAttribute('data-current-status', 'offline');
-
-            // Icon'u kırmızı yap
-            const statusIcon = document.querySelector('.status-icon.online, .status-icon.offline');
-            if (statusIcon) {
-                statusIcon.classList.remove('online');
-                statusIcon.classList.add('offline');
+            const translations = { tr: 'Çevrimdışı', en: 'Offline' };
+            if (statusElement) {
+                statusElement.textContent = translations[currentLang];
+                statusElement.style.color = 'var(--danger)';
+                statusElement.setAttribute('data-current-status', 'offline');
             }
 
-            // Ping'i gösterme - bot kapalı mesajı göster
-            pingElement.textContent = '--';
-            pingElement.style.color = 'var(--text-muted)';
-            const pingTranslations = {
-                tr: 'Bot Kapalı',
-                en: 'Bot Offline'
-            };
-            pingDetail.textContent = pingTranslations[currentLang];
-            pingDetail.setAttribute('data-ping-status', 'offline');
-        } else {
-            // Bot sunucuları çalışıyorsa icon'u yeşil yap
-            const statusIcon = document.querySelector('.status-icon.offline');
-            if (statusIcon) {
-                statusIcon.classList.remove('offline');
-                statusIcon.classList.add('online');
+            if (beaconElement) {
+                beaconElement.className = 'status-beacon beacon-offline';
+            }
+
+            if (pingElement) {
+                pingElement.textContent = '--';
+                pingElement.style.color = 'var(--text-muted)';
+            }
+            if (pingDetail) {
+                const pingTranslations = { tr: 'Bot Kapalı', en: 'Bot Offline' };
+                pingDetail.textContent = pingTranslations[currentLang];
+                pingDetail.setAttribute('data-ping-status', 'offline');
             }
         }
     }
@@ -512,54 +652,32 @@ class InfrastructureMonitor {
             api: 'operational'
         };
         this.rateLimitActive = false;
-        // GÜVENLİK: API URL'i private yapıldı, değiştirilemez
         const defaultApiUrl = 'https://aslanbotsite.onrender.com';
         let _apiUrl = defaultApiUrl;
 
-        // API URL'i sadece okunabilir yap ve değiştirmeyi engelle
         Object.defineProperty(this, 'apiUrl', {
             get: function () {
                 return _apiUrl;
             },
             set: function (newUrl) {
-                // Sadece güvenli origin'lere izin ver - Sıkı validation
                 try {
-                    // Önce string kontrolü
-                    if (typeof newUrl !== 'string' || newUrl.trim() === '') {
-                        console.warn('Güvenlik: Geçersiz URL formatı');
-                        return;
-                    }
-
+                    if (typeof newUrl !== 'string' || newUrl.trim() === '') return;
                     const urlObj = new URL(newUrl);
+                    if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') return;
 
-                    // Protokol kontrolü - sadece http ve https
-                    if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
-                        console.warn('Güvenlik: Sadece http ve https protokolleri izin verilir');
-                        return;
-                    }
-
-                    // Localhost kontrolü - exact match
                     const isLocalhost = urlObj.hostname === 'localhost' ||
                         urlObj.hostname === '127.0.0.1' ||
                         urlObj.hostname === '[::1]';
 
-                    // Güvenli domain kontrolü - exact match veya endsWith (subdomain saldırılarını önler)
-                    const allowedDomains = [
-                        'onrender.com',
-                        'vercel.app',
-                        'netlify.app'
-                    ];
+                    const allowedDomains = ['onrender.com', 'vercel.app', 'netlify.app'];
 
                     let isSecure = false;
                     if (urlObj.protocol === 'https:') {
-                        // Exact match kontrolü
                         if (allowedDomains.includes(urlObj.hostname)) {
                             isSecure = true;
                         } else {
-                            // Subdomain kontrolü - sadece *.domain.com formatına izin ver
                             for (const domain of allowedDomains) {
                                 if (urlObj.hostname.endsWith('.' + domain)) {
-                                    // Subdomain var mı kontrol et (en az bir nokta olmalı)
                                     const parts = urlObj.hostname.split('.');
                                     if (parts.length >= 3 && urlObj.hostname.endsWith('.' + domain)) {
                                         isSecure = true;
@@ -572,9 +690,6 @@ class InfrastructureMonitor {
 
                     if (isLocalhost || isSecure) {
                         _apiUrl = newUrl;
-                        console.log('Güvenlik: API URL güncellendi:', newUrl);
-                    } else {
-                        console.warn('Güvenlik: Sadece localhost veya güvenli origin\'lere izin verilir');
                     }
                 } catch (e) {
                     console.error('Güvenlik: Geçersiz URL:', e.message);
@@ -585,7 +700,6 @@ class InfrastructureMonitor {
         });
     }
 
-    // Altyapı durumu /api/server/status endpoint'inden geliyor
     async checkServices() {
         try {
             const apiUrl = window.botMonitorInstance ? window.botMonitorInstance.apiUrl : this.apiUrl;
@@ -593,7 +707,6 @@ class InfrastructureMonitor {
 
             if (!response.ok) {
                 if (response.status === 429) {
-                    // Rate limit hatası
                     this.rateLimitActive = true;
                     this.showRateLimitStatus();
                     return;
@@ -602,8 +715,6 @@ class InfrastructureMonitor {
             }
 
             const result = await response.json();
-
-            // Rate limit yoksa normal duruma dön
             this.rateLimitActive = false;
 
             if (result.success && result.data && result.data.infrastructure) {
@@ -613,12 +724,10 @@ class InfrastructureMonitor {
                 this.updateServiceStatus("bot", infra.bot);
                 this.updateServiceStatus('api', 'none');
 
-                // Bot sunucuları durumuna göre bot durumunu güncelle
                 if (window.botMonitorInstance && infra.bot) {
                     window.botMonitorInstance.updateBotStatusFromInfrastructure(infra.bot);
                 }
             } else {
-                // Eğer infrastructure verisi yoksa varsayılan olarak operational yap
                 this.updateServiceStatus("github", "none");
                 this.updateServiceStatus("discord", "none");
                 this.updateServiceStatus("bot", "none");
@@ -627,56 +736,51 @@ class InfrastructureMonitor {
 
         } catch (error) {
             console.error('Error checking services:', error);
-            // Rate limit değilse normal hata göster
             if (!this.rateLimitActive) {
                 this.updateServiceStatus("github", "critical");
                 this.updateServiceStatus("discord", "critical");
                 this.updateServiceStatus("bot", "critical");
                 this.updateServiceStatus("api", "critical");
 
-                // Bot sunucuları critical olduğunda bot durumunu da güncelle
                 if (window.botMonitorInstance) {
                     window.botMonitorInstance.updateBotStatusFromInfrastructure('critical');
                 }
             }
         }
 
-        setTimeout(() => this.updateSystemStatus(), 1000);
+        setTimeout(() => this.updateSystemStatus(), 500);
     }
 
     showRateLimitStatus() {
-        // Tüm servislerde rate limit göster
         const serviceNames = ['github', 'bot', 'discord', 'api'];
         serviceNames.forEach(serviceName => {
             const card = document.querySelector(`.infra-icon.${serviceName}`)?.closest('.infra-card');
             if (card) {
                 const badge = card.querySelector('.status-badge');
                 const detail = card.querySelector('.infra-detail');
+                const barFill = card.querySelector('.infra-bar-fill');
 
                 if (badge) {
                     badge.className = 'status-badge outage';
-                    const translations = {
-                        tr: 'Rate Limit',
-                        en: 'Rate Limit'
-                    };
+                    const translations = { tr: 'Rate Limit', en: 'Rate Limit' };
                     badge.textContent = translations[currentLang];
                     badge.setAttribute('data-service-status', 'rate-limit');
                     badge.setAttribute('data-service-name', serviceName);
                 }
 
                 if (detail) {
-                    const translations = {
-                        tr: 'Rate Limit Aşıldı',
-                        en: 'Rate Limit Exceeded'
-                    };
+                    const translations = { tr: 'Rate Limit Aşıldı', en: 'Rate Limit Exceeded' };
                     detail.textContent = translations[currentLang];
                     detail.setAttribute('data-service-status', 'rate-limit');
                     detail.setAttribute('data-service-name', serviceName);
                 }
+
+                if (barFill) {
+                    barFill.style.background = 'var(--warning)';
+                }
             }
         });
 
-        // Genel durum mesajını da güncelle
         setTimeout(() => this.updateSystemStatus(), 100);
     }
 
@@ -700,79 +804,70 @@ class InfrastructureMonitor {
 
         const systemElement = document.getElementById('systemStatus');
         const detailElement = document.getElementById('systemDetail');
-        const iconElement = document.querySelector('.status-icon.infrastructure-status');
 
-        let finalStatus = 'operational';
-        if (statuses.includes('outage')) finalStatus = 'outage';
-        else if (statuses.includes('degraded')) finalStatus = 'degraded';
+        const botCard = document.querySelector('.infra-icon.bot')?.closest('.infra-card');
+        const discordCard = document.querySelector('.infra-icon.discord')?.closest('.infra-card');
+        const githubCard = document.querySelector('.infra-icon.github')?.closest('.infra-card');
 
-        const statusTitles = {
-            operational: { tr: 'Sistem Normal', en: 'Systems Normal' },
-            degraded: { tr: 'Sıkıntılı', en: 'Systems Degraded' },
-            outage: { tr: 'Kesinti Var', en: 'System Outage' }
-        };
+        const botBadge = botCard?.querySelector('.status-badge');
+        const discordBadge = discordCard?.querySelector('.status-badge');
+        const githubBadge = githubCard?.querySelector('.status-badge');
 
-        const statusDetails = {
-            operational: { tr: 'Tüm servisler aktif', en: 'All services active' },
-            degraded: { tr: 'Bazı servislerde sorun var', en: 'Issues with some services' },
-            outage: { tr: 'Kritik servis kesintisi', en: 'Critical service outage' }
-        };
+        const isBotDown = botBadge?.classList.contains('outage') || botBadge?.getAttribute('data-service-status') === 'outage';
+        const isDiscordDown = discordBadge?.classList.contains('outage') || discordBadge?.getAttribute('data-service-status') === 'outage';
+        const isGithubDown = githubBadge?.classList.contains('outage') || githubBadge?.getAttribute('data-service-status') === 'outage';
 
-        systemElement.textContent = statusTitles[finalStatus][currentLang];
-        detailElement.textContent = statusDetails[finalStatus][currentLang];
+        let statusText = { tr: 'Sistem Normal', en: 'Systems Normal' };
+        let detailText = { tr: 'Tüm servisler aktif', en: 'All services active' };
+        let statusType = 'operational';
 
-        // Durumu sakla (dil değişikliği için)
-        systemElement.setAttribute('data-system-status', finalStatus);
-        detailElement.setAttribute('data-system-status', finalStatus);
+        if (this.rateLimitActive) {
+            statusType = 'rate-limit';
+            statusText = { tr: 'Rate Limit', en: 'Rate Limit' };
+            detailText = { tr: 'Rate limit aşıldı, lütfen bekleyin', en: 'Rate limit exceeded, please wait' };
+        } else if (isBotDown) {
+            statusType = 'outage';
+            statusText = { tr: 'Kritik Sistem Arızası', en: 'Critical System Outage' };
+            detailText = { tr: 'Bot sunucularına erişilemiyor', en: 'Bot servers unreachable' };
+        } else if (isDiscordDown) {
+            statusType = 'degraded';
+            statusText = { tr: 'Discord Ağ Sorunu', en: 'Discord Network Issue' };
+            detailText = { tr: 'Discord sunucularında kesinti var', en: 'Discord API servers degraded' };
+        } else if (isGithubDown) {
+            statusType = 'degraded';
+            statusText = { tr: 'Ufak Sistem Hataları', en: 'Minor System Glitches' };
+            detailText = { tr: 'GitHub sunucularında gecikme yaşanıyor', en: 'GitHub API latency detected' };
+        } else if (statuses.includes('outage')) {
+            statusType = 'outage';
+            statusText = { tr: 'Kritik Sistem Arızası', en: 'Critical System Outage' };
+            detailText = { tr: 'Kritik servis kesintisi tespit edildi', en: 'Critical service outage' };
+        } else if (statuses.includes('degraded')) {
+            statusType = 'degraded';
+            statusText = { tr: 'Performans Düşüşü', en: 'Degraded State' };
+            detailText = { tr: 'Bazı servislerde gecikme var', en: 'Issues with some services' };
+        }
 
-        if (finalStatus === 'operational') {
-            systemElement.style.color = 'var(--success)';
-            iconElement.style.background = 'linear-gradient(135deg, #43b581, #3ea06d)';
-        } else if (finalStatus === 'degraded') {
-            systemElement.style.color = 'var(--warning)';
-            iconElement.style.background = 'linear-gradient(135deg, #faa61a, #f04747)';
-        } else {
-            systemElement.style.color = 'var(--danger)';
-            iconElement.style.background = 'linear-gradient(135deg, #f04747, #d0021b)';
+        if (systemElement) {
+            systemElement.textContent = statusText[currentLang];
+            systemElement.setAttribute('data-system-status', statusType);
+
+            if (statusType === 'operational') {
+                systemElement.style.color = 'var(--success)';
+            } else if (statusType === 'degraded' || statusType === 'rate-limit') {
+                systemElement.style.color = 'var(--warning)';
+            } else {
+                systemElement.style.color = 'var(--danger)';
+            }
+        }
+
+        if (detailElement) {
+            detailElement.textContent = detailText[currentLang];
+            detailElement.setAttribute('data-system-status', statusType);
         }
     }
 
     updateSystemStatusLanguage() {
-        const systemElement = document.getElementById('systemStatus');
-        const detailElement = document.getElementById('systemDetail');
-
-        if (!systemElement || !detailElement) return;
-
-        const status = systemElement.getAttribute('data-system-status');
-
-        // Eğer durum yoksa, mevcut içerikten durumu tespit et
-        let finalStatus = status;
-        if (!finalStatus) {
-            const currentText = systemElement.textContent;
-            if (currentText.includes('Kesinti Var') || currentText.includes('System Outage')) {
-                finalStatus = 'outage';
-            } else if (currentText.includes('Sıkıntılı') || currentText.includes('Systems Degraded')) {
-                finalStatus = 'degraded';
-            } else {
-                finalStatus = 'operational';
-            }
-            systemElement.setAttribute('data-system-status', finalStatus);
-        }
-
-        const statusTitles = {
-            operational: { tr: 'Sistem Normal', en: 'Systems Normal' },
-            degraded: { tr: 'Sıkıntılı', en: 'Systems Degraded' },
-            outage: { tr: 'Kesinti Var', en: 'System Outage' }
-        };
-
-        const statusDetails = {
-            operational: { tr: 'Tüm servisler aktif', en: 'All services active' },
-            degraded: { tr: 'Bazı servislerde sorun var', en: 'Issues with some services' },
-            outage: { tr: 'Kritik servis kesintisi', en: 'Critical service outage' }
-        };
-
-        systemElement.textContent = statusTitles[finalStatus][currentLang];
-        detailElement.textContent = statusDetails[finalStatus][currentLang];
+        this.updateSystemStatus();
     }
 
     updateServiceStatus(serviceName, indicator) {
@@ -800,6 +895,7 @@ class InfrastructureMonitor {
             if (icon) {
                 const badge = card.querySelector(".status-badge");
                 const detail = card.querySelector(".infra-detail");
+                const barFill = card.querySelector(".infra-bar-fill");
 
                 let status = "operational";
                 if (indicator === "minor" || indicator === "major") {
@@ -810,16 +906,24 @@ class InfrastructureMonitor {
                     status = "operational";
                 }
 
-                badge.className = `status-badge ${status}`;
-                badge.textContent = translations[status][currentLang];
-                // Durumu sakla (dil değişikliği için)
-                badge.setAttribute('data-service-status', status);
-                badge.setAttribute('data-service-name', serviceName);
+                if (badge) {
+                    badge.className = `status-badge ${status}`;
+                    badge.textContent = translations[status][currentLang];
+                    badge.setAttribute('data-service-status', status);
+                    badge.setAttribute('data-service-name', serviceName);
+                }
 
-                detail.textContent = detailTranslations[status][currentLang];
-                // Detay durumunu da sakla
-                detail.setAttribute('data-service-status', status);
-                detail.setAttribute('data-service-name', serviceName);
+                if (detail) {
+                    detail.textContent = detailTranslations[status][currentLang];
+                    detail.setAttribute('data-service-status', status);
+                    detail.setAttribute('data-service-name', serviceName);
+                }
+
+                if (barFill) {
+                    if (status === 'operational') barFill.style.background = 'var(--success)';
+                    else if (status === 'degraded') barFill.style.background = 'var(--warning)';
+                    else barFill.style.background = 'var(--danger)';
+                }
 
                 this.serviceStates[serviceName] = status;
             }
@@ -857,12 +961,10 @@ class InfrastructureMonitor {
                 const detail = card.querySelector(".infra-detail");
 
                 if (badge) {
-                    // Önce attribute'dan durumu al, yoksa serviceStates'ten
                     const status = badge.getAttribute('data-service-status') ||
                         this.serviceStates[serviceName] ||
                         'operational';
 
-                    // Rate limit durumunu kontrol et
                     if (status === 'rate-limit' || this.rateLimitActive) {
                         badge.textContent = translations['rate-limit'][currentLang];
                         badge.setAttribute('data-service-status', 'rate-limit');
@@ -874,12 +976,10 @@ class InfrastructureMonitor {
                 }
 
                 if (detail) {
-                    // Önce attribute'dan durumu al, yoksa serviceStates'ten
                     const status = detail.getAttribute('data-service-status') ||
                         this.serviceStates[serviceName] ||
                         'operational';
 
-                    // Rate limit durumunu kontrol et
                     if (status === 'rate-limit' || this.rateLimitActive) {
                         detail.textContent = detailTranslations['rate-limit'][currentLang];
                         detail.setAttribute('data-service-status', 'rate-limit');
@@ -894,21 +994,16 @@ class InfrastructureMonitor {
     }
 
     start() {
-        this.checkServices();
-
+        this.fetchBotStatus();
         setInterval(() => {
-            this.checkServices();
+            this.fetchBotStatus();
         }, 120000);
     }
 }
 
-// ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', () => {
     const botMonitor = new DiscordBotMonitor();
 
-    // botMonitor.setApiUrl('https://your-backend-api.onrender.com');
-
-    // GÜVENLİK: Kritik metodları koruma altına al (freeze yerine)
     const originalFetchBotStatus = botMonitor.fetchBotStatus.bind(botMonitor);
     Object.defineProperty(botMonitor, 'fetchBotStatus', {
         value: originalFetchBotStatus,
@@ -926,38 +1021,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.botMonitorInstance = botMonitor;
-
     botMonitor.start();
 
     const infraMonitor = new InfrastructureMonitor();
     window.infraMonitorInstance = infraMonitor;
-
     infraMonitor.start();
 
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px",
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = "1";
-                entry.target.style.transform = "translateY(0)";
-            }
-        });
-    }, observerOptions);
-
-    document
-        .querySelectorAll(".status-card, .infra-card, .support-card")
-        .forEach((card) => {
-            card.style.opacity = "0";
-            card.style.transform = "translateY(30px)";
-            card.style.transition = "opacity 0.6s ease, transform 0.6s ease";
-            observer.observe(card);
-        });
-
-    // GÜVENLİK: Toast close button event listener (inline onclick yerine)
     const toastCloseBtn = document.getElementById('toastClose');
     if (toastCloseBtn) {
         toastCloseBtn.addEventListener('click', () => {
@@ -968,5 +1037,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-// formatNumber ve formatTime fonksiyonları kaldırıldı - kullanılmıyor

@@ -649,7 +649,7 @@ class InfrastructureMonitor {
             github: 'operational',
             bot: 'operational',
             discord: 'operational',
-            api: 'operational'
+            api: 'degraded'
         };
         this.rateLimitActive = false;
         const defaultApiUrl = 'https://aslanbotsite.onrender.com';
@@ -808,14 +808,17 @@ class InfrastructureMonitor {
         const botCard = document.querySelector('.infra-icon.bot')?.closest('.infra-card');
         const discordCard = document.querySelector('.infra-icon.discord')?.closest('.infra-card');
         const githubCard = document.querySelector('.infra-icon.github')?.closest('.infra-card');
+        const apiCard = document.querySelector('.infra-icon.api')?.closest('.infra-card');
 
         const botBadge = botCard?.querySelector('.status-badge');
         const discordBadge = discordCard?.querySelector('.status-badge');
         const githubBadge = githubCard?.querySelector('.status-badge');
+        const apiBadge = apiCard?.querySelector('.status-badge');
 
         const isBotDown = botBadge?.classList.contains('outage') || botBadge?.getAttribute('data-service-status') === 'outage';
         const isDiscordDown = discordBadge?.classList.contains('outage') || discordBadge?.getAttribute('data-service-status') === 'outage';
         const isGithubDown = githubBadge?.classList.contains('outage') || githubBadge?.getAttribute('data-service-status') === 'outage';
+        const isApiIssue = apiBadge?.classList.contains('degraded') || apiBadge?.classList.contains('outage') || apiBadge?.getAttribute('data-service-status') === 'degraded';
 
         let statusText = { tr: 'Sistem Normal', en: 'Systems Normal' };
         let detailText = { tr: 'Tüm servisler aktif', en: 'All services active' };
@@ -837,6 +840,10 @@ class InfrastructureMonitor {
             statusType = 'degraded';
             statusText = { tr: 'Ufak Sistem Hataları', en: 'Minor System Glitches' };
             detailText = { tr: 'GitHub sunucularında gecikme yaşanıyor', en: 'GitHub API latency detected' };
+        } else if (isApiIssue) {
+            statusType = 'degraded';
+            statusText = { tr: 'API Kesintisi', en: 'API Outage' };
+            detailText = { tr: 'Yapay zeka api bozuk', en: 'AI API is down' };
         } else if (statuses.includes('outage')) {
             statusType = 'outage';
             statusText = { tr: 'Kritik Sistem Arızası', en: 'Critical System Outage' };
@@ -874,7 +881,7 @@ class InfrastructureMonitor {
         const infraCards = document.querySelectorAll(".infra-card");
         const translations = {
             operational: { tr: "Normal", en: "Operational" },
-            degraded: { tr: "Olaylı", en: "Degraded" },
+            degraded: { tr: "Kesinti", en: "Outage" },
             outage: { tr: "Bozuk", en: "Outage" },
         };
 
@@ -933,7 +940,7 @@ class InfrastructureMonitor {
     updateServicesLanguage() {
         const translations = {
             operational: { tr: "Normal", en: "Operational" },
-            degraded: { tr: "Olaylı", en: "Degraded" },
+            degraded: { tr: "Kesinti", en: "Outage" },
             outage: { tr: "Bozuk", en: "Outage" },
             'rate-limit': { tr: "Rate Limit", en: "Rate Limit" },
         };

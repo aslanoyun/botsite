@@ -221,11 +221,11 @@
                 <span class="metric-tag" data-tr="ALTYAPI SAĞLIĞI" data-en="INFRA HEALTH">ALTYAPI SAĞLIĞI</span>
               </div>
               <div class="metric-label" data-tr="Sistem Durumu" data-en="System Status">Sistem Durumu</div>
-              <div class="metric-value" id="systemStatus">Sistem Normal</div>
+              <div class="metric-value" id="systemStatus" style="color: var(--warning);" data-tr="API Kesintisi"
+                data-en="API Outage">API Kesintisi</div>
               <div class="metric-footer">
-                <span class="status-detail" id="systemDetail" data-tr="Tüm servisler aktif"
-                  data-en="All services active">
-                  Tüm servisler aktif
+                <span class="status-detail" id="systemDetail" data-tr="Yapay zeka API bozuk" data-en="AI API is down">
+                  Yapay zeka API bozuk
                 </span>
               </div>
             </div>
@@ -352,13 +352,13 @@
                   </div>
                   <h3 class="infra-name" data-tr="API Sunucuları" data-en="API Servers">API Sunucuları</h3>
                 </div>
-                <span class="status-badge operational" data-tr="Normal" data-en="Operational">Normal</span>
+                <span class="status-badge degraded" data-tr="Kesinti" data-en="Outage">Kesinti</span>
               </div>
               <div class="infra-bar-wrap">
-                <div class="infra-bar-fill"></div>
+                <div class="infra-bar-fill" style="background: var(--warning);"></div>
               </div>
-              <p class="infra-desc infra-detail" data-tr="Hızlı yanıt süresi" data-en="Fast response time">
-                Tüm sistemler çalışıyor
+              <p class="infra-desc infra-detail" data-tr="Yapay zeka API bozuk" data-en="AI API is down">
+                Yapay zeka API bozuk
               </p>
             </div>
           </div>
